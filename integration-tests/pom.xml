@@ -20,6 +20,10 @@
             <artifactId>quarkus-rest</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-config-yaml</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.acme</groupId>
             <artifactId>edgy</artifactId>
             <version>${project.version}</version>
