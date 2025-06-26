@@ -21,7 +21,6 @@ public interface EdgyConfig {
         String bar();
     }
 
-    @WithParentName
     Map<String, Flex> flexes();
 
     interface Flex {

@@ -47,7 +47,7 @@ public class EdgyTest {
         assertThat(jsonPath.getString("host"), is("localhost"));
         assertThat(jsonPath.getString("port"), is("1234"));
         assertThat(jsonPath.getString("foo.bar"), is("Bar"));
-        assertThat(jsonPath.getString("flexes[0].id"), is("the-first"));
-        assertThat(jsonPath.getString("flexes[0].extra.def"), is("456"));
+        assertThat(jsonPath.getString("flexes.first.id"), is("the-first"));
+        assertThat(jsonPath.getString("flexes.first.extra.def"), is("456"));
     }
 }
