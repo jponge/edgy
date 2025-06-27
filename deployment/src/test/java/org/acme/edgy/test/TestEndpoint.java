@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import org.acme.edgy.runtime.config.EdgyConfig;
+import org.acme.edgy.runtime.config.SquaresConfig;
 
 @ApplicationScoped
 @Path("/")
@@ -20,6 +21,9 @@ public class TestEndpoint {
 
     @Inject
     EdgyConfig config;
+
+    @Inject
+    SquaresConfig squaresConfig;
 
     @GET
     @Path("config")
@@ -37,7 +41,13 @@ public class TestEndpoint {
                 .put("port", config.port())
                 .put("foo", new JsonObject().put("bar", config.foo().bar()))
                 .put("flexes", flexes);
-        Log.info(payload.encodePrettily());
+//        Log.info(payload.encodePrettily());
+        for (EdgyConfig.Shape shape : config.shapes()) {
+            Log.info("➡️ " + shape.name());
+        }
+        squaresConfig.squares().forEach((s, square) -> {
+            Log.info(s + " = " + square.side());
+        });
         return payload;
 
     }
