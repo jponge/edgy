@@ -11,4 +11,8 @@ public class RoutingConfiguration {
         routes.add(route);
         return this;
     }
+
+    public List<Route> routes() {
+        return routes;
+    }
 }
