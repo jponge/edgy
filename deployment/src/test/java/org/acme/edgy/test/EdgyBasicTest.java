@@ -1,5 +1,6 @@
 package org.acme.edgy.test;
 
+import io.quarkus.test.QuarkusUnitTest;
 import io.restassured.RestAssured;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
@@ -11,8 +12,6 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import io.quarkus.test.QuarkusUnitTest;
 
 import static org.hamcrest.Matchers.is;
 
@@ -42,16 +41,6 @@ public class EdgyBasicTest {
     static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
             .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
                     .addClasses(RoutingProvider.class, TestApi.class));
-
-    @Test
-    public void smokeTest_configurator() {
-        // TODO eventually drop this smoke test
-        RestAssured.given()
-                .get("/yolo")
-                .then()
-                .statusCode(200)
-                .body(is("Yolo!"));
-    }
 
     @Test
     public void test_helloProxy() {

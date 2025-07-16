@@ -33,10 +33,6 @@ public class RouterConfigurator {
     private HttpClient httpClient;
 
     void configure(@Observes Router router) {
-        // TODO remove
-        router.get("/yolo")
-                .handler(rc -> rc.end("Yolo!"));
-
         httpClient = vertx.createHttpClient();
 
         // TODO this is a very early hacky start
