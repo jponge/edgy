@@ -16,11 +16,6 @@ import jakarta.inject.Inject;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import static java.util.Objects.requireNonNullElse;
-
 @ApplicationScoped
 @DefaultBean
 public class RouterConfigurator {
@@ -39,11 +34,11 @@ public class RouterConfigurator {
         for (Route route : routingConfiguration.routes()) {
             OriginSpec originSpec = OriginSpec.of(route.origin());
             HttpProxy proxy = HttpProxy.reverseProxy(httpClient)
-                    .origin(originSpec.port, originSpec.host)
+                    .origin(originSpec.port(), originSpec.host())
                     .addInterceptor(new ProxyInterceptor() {
                         @Override
                         public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
-                            context.request().setURI(originSpec.path);
+                            context.request().setURI(originSpec.path());
                             return context.sendRequest();
                         }
                     });
@@ -51,22 +46,4 @@ public class RouterConfigurator {
         }
     }
 
-    record OriginSpec(String protocol, String host, int port, String path) {
-        static OriginSpec of(String spec) {
-            try {
-                URI uri = new URI(spec);
-                String uScheme = uri.getScheme();
-                String uHost = uri.getHost();
-                int uPort = uri.getPort();
-                String uPath = uri.getPath();
-                return new OriginSpec(
-                        requireNonNullElse(uScheme, "http"),
-                        requireNonNullElse(uHost, "localhost"),
-                        uPort > 0 ? uPort : 8080,
-                        requireNonNullElse(uPath, "/"));
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 }

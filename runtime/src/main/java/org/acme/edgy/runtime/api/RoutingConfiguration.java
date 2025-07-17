@@ -16,3 +16,5 @@ public class RoutingConfiguration {
         return routes;
     }
 }
+
+// TODO model: predicates (RoutingContext), request transformers (interceptors), response transformers

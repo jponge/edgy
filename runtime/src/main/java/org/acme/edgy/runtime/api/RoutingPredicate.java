@@ -1,6 +1,6 @@
 package org.acme.edgy.runtime.api;
 
-import io.vertx.mutiny.ext.web.RoutingContext;
+import io.vertx.ext.web.RoutingContext;
 
 import java.util.function.Predicate;
 
