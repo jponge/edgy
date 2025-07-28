@@ -15,6 +15,7 @@ import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
+import org.acme.edgy.runtime.api.RoutingPredicate;
 
 @ApplicationScoped
 @DefaultBean
@@ -42,7 +43,13 @@ public class RouterConfigurator {
                             return context.sendRequest();
                         }
                     });
-            router.route(route.path()).handler(ProxyHandler.create(proxy));
+            router.route(route.path()).handler(rc -> {
+                if (route.predicates().stream().allMatch(predicate -> predicate.test(rc))) {
+                    ProxyHandler.create(proxy).handle(rc);
+                } else {
+                    rc.next();
+                }
+            });
         }
     }
 

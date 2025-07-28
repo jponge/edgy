@@ -4,10 +4,7 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.util.function.Predicate;
 
+@FunctionalInterface
 public interface RoutingPredicate extends Predicate<RoutingContext> {
 
-    @Override
-    default boolean test(RoutingContext routingContext) {
-        return true;
-    }
 }
