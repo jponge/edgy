@@ -21,6 +21,15 @@ class OriginSpecTest {
     }
 
     @Test
+    void checkSpecWithNonStandardChars() {
+        OriginSpec spec = OriginSpec.of("https://my.api.private:1443/:backend/{version}");
+        assertThat(spec.protocol(), is("https"));
+        assertThat(spec.host(), is("my.api.private"));
+        assertThat(spec.port(), is(1443));
+        assertThat(spec.path(), is("/:backend/{version}"));
+    }
+
+    @Test
     void checkBasicSpecWithQuery() {
         OriginSpec spec = OriginSpec.of("https://my.api.private/backend?a=1&b=2");
         assertThat(spec.protocol(), is("https"));
