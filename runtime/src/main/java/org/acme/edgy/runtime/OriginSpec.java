@@ -1,16 +1,17 @@
 package org.acme.edgy.runtime;
 
-import static java.util.Objects.requireNonNullElse;
+import org.acme.edgy.runtime.api.PathMode;
 
-record OriginSpec(String protocol, String host, int port, String path) {
-    static OriginSpec of(String spec) {
+record OriginSpec(String protocol, String host, int port, String path, PathMode pathMode) {
+
+    static OriginSpec of(String spec, PathMode pathMode) {
         String protocol = "http";
         String host = "localhost";
         int port = 8080;
         String path = "/";
 
         if (spec == null || spec.isEmpty()) {
-            return new OriginSpec(protocol, host, port, path);
+            return new OriginSpec(protocol, host, port, path,  pathMode);
         }
 
         String remaining = spec;
@@ -44,6 +45,6 @@ record OriginSpec(String protocol, String host, int port, String path) {
             path = pathPart;
         }
 
-        return new OriginSpec(protocol, host, port, path);
+        return new OriginSpec(protocol, host, port, path, pathMode);
     }
 }

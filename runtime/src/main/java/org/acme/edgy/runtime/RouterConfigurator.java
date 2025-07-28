@@ -15,7 +15,6 @@ import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
-import org.acme.edgy.runtime.api.RoutingPredicate;
 
 @ApplicationScoped
 @DefaultBean
@@ -33,7 +32,7 @@ public class RouterConfigurator {
 
         // TODO this is a very early hacky start
         for (Route route : routingConfiguration.routes()) {
-            OriginSpec originSpec = OriginSpec.of(route.origin());
+            OriginSpec originSpec = OriginSpec.of(route.origin(), route.pathMode());
             HttpProxy proxy = HttpProxy.reverseProxy(httpClient)
                     .origin(originSpec.port(), originSpec.host())
                     .addInterceptor(new ProxyInterceptor() {
@@ -43,7 +42,14 @@ public class RouterConfigurator {
                             return context.sendRequest();
                         }
                     });
-            router.route(route.path()).handler(rc -> {
+
+            io.vertx.ext.web.Route base = switch (route.pathMode()) {
+                case FIXED -> router.route(route.path());
+                case PREFIX -> router.route(route.path());
+                case PARAMS -> router.route(route.path());
+                case REGEXP -> router.routeWithRegex(route.path());
+            };
+           base.handler(rc -> {
                 if (route.predicates().stream().allMatch(predicate -> predicate.test(rc))) {
                     ProxyHandler.create(proxy).handle(rc);
                 } else {

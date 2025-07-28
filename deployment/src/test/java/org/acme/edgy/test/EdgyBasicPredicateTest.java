@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -23,11 +24,11 @@ public class EdgyBasicPredicateTest {
         @Produces
         RoutingConfiguration predicatesRouting() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/hello", "http://localhost:8081/test/hello")
+                    .addRoute(new Route("/hello", "http://localhost:8081/test/hello", PathMode.FIXED)
                             .addPredicate(rc ->
                                     "baz".equals(rc.request().getHeader("X-FOO-BAR"))
                             ))
-                    .addRoute(new Route("/hello", "http://localhost:8081/test/hello")
+                    .addRoute(new Route("/hello", "http://localhost:8081/test/hello",  PathMode.FIXED)
                             .addPredicate(rc -> true)
                             .addPredicate(rc ->
                                     rc.request().getHeader("X-YOLO") != null
