@@ -18,6 +18,7 @@ import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
+import org.acme.edgy.runtime.api.RequestTransformer;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
 
@@ -35,6 +36,7 @@ public class RouterConfigurator {
         HttpClient httpClient = vertx.createHttpClient();
 
         // TODO this is a very early hacky start
+
         for (Route route : routingConfiguration.routes()) {
             Origin origin = route.origin();
             UriTemplate uriTemplate = UriTemplate.of(origin.path());
@@ -55,6 +57,15 @@ public class RouterConfigurator {
                             return context.sendRequest();
                         }
                     });
+
+            for (RequestTransformer requestTransformer : route.requestTransformers()) {
+                proxy.addInterceptor(new ProxyInterceptor() {
+                    @Override
+                    public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
+                        return requestTransformer.apply(context);
+                    }
+                });
+            }
 
             io.vertx.ext.web.Route base = switch (route.pathMode()) {
                 case FIXED -> router.route(route.path());
