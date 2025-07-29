@@ -1,11 +1,10 @@
 package org.acme.edgy.it;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.is;
-
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
-import io.quarkus.test.junit.QuarkusTest;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.is;
 
 @QuarkusTest
 public class EdgyResourceTest {
