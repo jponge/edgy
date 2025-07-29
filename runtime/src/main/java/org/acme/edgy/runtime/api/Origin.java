@@ -1,17 +1,18 @@
-package org.acme.edgy.runtime;
+package org.acme.edgy.runtime.api;
 
-import org.acme.edgy.runtime.api.PathMode;
+import io.vertx.core.http.RequestOptions;
+import io.vertx.httpproxy.OriginRequestProvider;
 
-record OriginSpec(String protocol, String host, int port, String path, PathMode pathMode) {
+public record Origin(String protocol, String host, int port, String path) {
 
-    static OriginSpec of(String spec, PathMode pathMode) {
+    public static Origin of(String spec) {
         String protocol = "http";
         String host = "localhost";
         int port = 8080;
         String path = "/";
 
         if (spec == null || spec.isEmpty()) {
-            return new OriginSpec(protocol, host, port, path,  pathMode);
+            return new Origin(protocol, host, port, path);
         }
 
         String remaining = spec;
@@ -45,6 +46,13 @@ record OriginSpec(String protocol, String host, int port, String path, PathMode 
             path = pathPart;
         }
 
-        return new OriginSpec(protocol, host, port, path, pathMode);
+        return new Origin(protocol, host, port, path);
+    }
+
+    public OriginRequestProvider originRequestProvider() {
+        // TODO handle dynamic selection (e.g., stork://, etc)
+        return proxyContext -> proxyContext.client().request(new RequestOptions()
+                .setHost(host)
+                .setPort(port));
     }
 }

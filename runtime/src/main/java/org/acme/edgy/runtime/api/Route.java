@@ -6,11 +6,11 @@ import java.util.List;
 public class Route {
 
     private final String path;
-    private final String origin;
+    private final Origin origin;
     private final PathMode pathMode;
     private final List<RoutingPredicate> predicates = new ArrayList<>();
 
-    public Route(String path, String origin, PathMode pathMode) {
+    public Route(String path, Origin origin, PathMode pathMode) {
         this.path = path;
         this.origin = origin;
         this.pathMode = pathMode;
@@ -20,7 +20,7 @@ public class Route {
         return path;
     }
 
-    public String origin() {
+    public Origin origin() {
         return origin;
     }
 

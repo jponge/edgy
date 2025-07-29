@@ -6,8 +6,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.UriInfo;
+import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
@@ -26,8 +26,8 @@ public class EdgyUriTemplatesRewriteTest {
         @Produces
         RoutingConfiguration basicRouting() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/v1/*", "http://localhost:8081/test/dump/{__REQUEST_URI__}", PathMode.PREFIX))
-                    .addRoute(new Route("/v2/*", "http://localhost:8081/test/dump/{__REQUEST_URI_AFTER_PREFIX__}", PathMode.PREFIX))
+                    .addRoute(new Route("/v1/*", Origin.of("http://localhost:8081/test/dump/{__REQUEST_URI__}"), PathMode.PREFIX))
+                    .addRoute(new Route("/v2/*", Origin.of("http://localhost:8081/test/dump/{__REQUEST_URI_AFTER_PREFIX__}"), PathMode.PREFIX))
                     ;
         }
     }

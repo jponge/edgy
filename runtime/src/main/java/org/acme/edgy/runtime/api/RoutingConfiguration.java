@@ -5,7 +5,7 @@ import java.util.List;
 
 public class RoutingConfiguration {
 
-    private final List<Route> routes =  new ArrayList<>();
+    private final List<Route> routes = new ArrayList<>();
 
     public RoutingConfiguration addRoute(Route route) {
         routes.add(route);

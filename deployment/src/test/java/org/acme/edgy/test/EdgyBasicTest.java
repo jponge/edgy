@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
@@ -24,7 +25,7 @@ public class EdgyBasicTest {
         @Produces
         RoutingConfiguration basicRouting() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/hello", "http://localhost:8081/test/hello", PathMode.FIXED));
+                    .addRoute(new Route("/hello", Origin.of("http://localhost:8081/test/hello"), PathMode.FIXED));
         }
     }
 

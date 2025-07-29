@@ -16,6 +16,7 @@ import io.vertx.uritemplate.Variables;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
@@ -29,17 +30,16 @@ public class RouterConfigurator {
 
     @Inject
     RoutingConfiguration routingConfiguration;
-    private HttpClient httpClient;
 
     void configure(@Observes Router router) {
-        httpClient = vertx.createHttpClient();
+        HttpClient httpClient = vertx.createHttpClient();
 
         // TODO this is a very early hacky start
         for (Route route : routingConfiguration.routes()) {
-            OriginSpec originSpec = OriginSpec.of(route.origin(), route.pathMode());
-            UriTemplate uriTemplate = UriTemplate.of(originSpec.path());
+            Origin origin = route.origin();
+            UriTemplate uriTemplate = UriTemplate.of(origin.path());
             HttpProxy proxy = HttpProxy.reverseProxy(httpClient)
-                    .origin(originSpec.port(), originSpec.host())
+                    .origin(origin.originRequestProvider())
                     .addInterceptor(new ProxyInterceptor() {
                         @Override
                         public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
