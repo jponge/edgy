@@ -19,6 +19,7 @@ import jakarta.inject.Inject;
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.RequestTransformer;
+import org.acme.edgy.runtime.api.ResponseTransformer;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
 
@@ -63,6 +64,15 @@ public class RouterConfigurator {
                     @Override
                     public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
                         return requestTransformer.apply(context);
+                    }
+                });
+            }
+
+            for (ResponseTransformer responseTransformer : route.responseTransformers()) {
+                proxy.addInterceptor(new ProxyInterceptor() {
+                    @Override
+                    public Future<Void> handleProxyResponse(ProxyContext context) {
+                        return responseTransformer.apply(context);
                     }
                 });
             }

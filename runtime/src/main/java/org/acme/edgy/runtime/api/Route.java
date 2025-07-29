@@ -10,6 +10,7 @@ public class Route {
     private final PathMode pathMode;
     private final List<RoutingPredicate> predicates = new ArrayList<>();
     private final List<RequestTransformer> requestTransformers = new ArrayList<>();
+    private final List<ResponseTransformer> responseTransformers = new ArrayList<>();
 
     public Route(String path, Origin origin, PathMode pathMode) {
         this.path = path;
@@ -44,6 +45,15 @@ public class Route {
 
     public Route addRequestTransformer(RequestTransformer requestTransformer) {
         requestTransformers.add(requestTransformer);
+        return this;
+    }
+
+    public List<ResponseTransformer> responseTransformers() {
+        return responseTransformers;
+    }
+
+    public Route addResponseTransformer(ResponseTransformer responseTransformer) {
+        responseTransformers.add(responseTransformer);
         return this;
     }
 }
