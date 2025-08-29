@@ -7,4 +7,5 @@ import java.util.function.Predicate;
 @FunctionalInterface
 public interface RoutingPredicate extends Predicate<RoutingContext> {
 
+    // TODO: should we have async predicates?
 }
