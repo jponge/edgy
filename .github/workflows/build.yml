@@ -1,0 +1,50 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - '.gitignore'
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '*.md'
+      - '*.adoc'
+      - '*.txt'
+      - '.all-contributorsrc'
+  pull_request:
+    paths-ignore:
+      - '.gitignore'
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '*.md'
+      - '*.adoc'
+      - '*.txt'
+      - '.all-contributorsrc'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [17, 21]
+    name: Build on Java ${{ matrix.java }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: ./mvnw -B install
+
+      - name: Build with Maven (Native)
+        run: ./mvnw -B install -Dnative -Dquarkus.native.container-build -Dnative.surefire.skip
