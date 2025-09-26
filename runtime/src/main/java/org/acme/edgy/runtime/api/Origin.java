@@ -3,6 +3,9 @@ package org.acme.edgy.runtime.api;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.httpproxy.OriginRequestProvider;
 
+import static io.smallrye.stork.Stork.STORK;
+import static org.acme.edgy.runtime.api.utils.StorkUtils.storkFuture;
+
 public record Origin(String protocol, String host, int port, String path) {
 
     public static Origin of(String spec) {
@@ -50,9 +53,13 @@ public record Origin(String protocol, String host, int port, String path) {
     }
 
     public OriginRequestProvider originRequestProvider() {
-        // TODO handle dynamic selection (e.g., stork://, etc)
-        return proxyContext -> proxyContext.client().request(new RequestOptions()
-                .setHost(host)
-                .setPort(port));
+        return proxyContext -> {
+            if (STORK.equals(protocol)) {
+                return storkFuture(host, proxyContext);
+            }
+            return proxyContext.client().request(new RequestOptions()
+                    .setHost(host)
+                    .setPort(port));
+        };
     }
 }
