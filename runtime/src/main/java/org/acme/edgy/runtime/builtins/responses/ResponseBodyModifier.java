@@ -9,10 +9,6 @@ import io.vertx.httpproxy.ProxyContext;
 
 public class ResponseBodyModifier implements ResponseTransformer {
 
-    // TODO support for JSON/XML content type body handling
-    // 5.x Vertx HTTP Proxy seems to have a basic implementation for this use case
-    // see io.vertx.httpproxy.BodyTransformer
-
     private final Function<ProxyContext, Body> mapper;
 
     public ResponseBodyModifier(Function<ProxyContext, Body> mapper) {
