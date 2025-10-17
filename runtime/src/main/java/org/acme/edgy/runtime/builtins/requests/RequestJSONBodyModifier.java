@@ -3,9 +3,11 @@ package org.acme.edgy.runtime.builtins.requests;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.acme.edgy.runtime.api.RequestTransformer;
+import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
 import org.acme.edgy.runtime.builtins.AbstractJSONBodyModifier;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
@@ -31,7 +33,15 @@ public class RequestJSONBodyModifier extends AbstractJSONBodyModifier
         if (mapper == null) {
             return applyStaticBody(proxyContext, ProxyContext::sendRequest);
         }
-        return applyDynamicBody(proxyContext, ProxyContext::sendRequest);
+
+        return applyDynamicBody(proxyContext, ProxyContext::sendRequest).recover(throwable -> {
+            if (throwable instanceof DecodeException) {
+                return ProxyResponseFactory.badRequestInRequestTransformer(proxyContext,
+                        throwable.getMessage());
+            }
+            return Future.failedFuture(throwable);
+        });
+
     }
 
     @Override
@@ -45,11 +55,6 @@ public class RequestJSONBodyModifier extends AbstractJSONBodyModifier
             @Override
             public void setBody(Body body) {
                 proxyContext.request().setBody(body);
-            }
-
-            @Override
-            public MultiMap headers() {
-                return proxyContext.request().headers();
             }
         };
     }

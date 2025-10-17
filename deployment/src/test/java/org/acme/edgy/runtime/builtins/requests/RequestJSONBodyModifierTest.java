@@ -19,9 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import static org.hamcrest.Matchers.containsString;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_REQUEST;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
 
 class RequestJSONBodyModifierTest {
@@ -185,8 +187,15 @@ class RequestJSONBodyModifierTest {
     }
 
     @Test
-    void test_replaceFull() { // changes content type to application/json
-        RestAssured.given().contentType(TEXT_PLAIN).body("some text").post("/replace-full").then()
+    void test_replaceFull() {
+        RestAssured.given().contentType(APPLICATION_JSON).body("{\"some\":\"value\"}")
+                .post("/replace-full").then()
                 .statusCode(OK);
+    }
+
+    @Test
+    void test_dynamicFailsDueToInvalidJSONBody() {
+        RestAssured.given().contentType(APPLICATION_JSON).body("invalid json").post("/modify-field")
+                .then().statusCode(BAD_REQUEST).and().body(containsString("JSON"));
     }
 }

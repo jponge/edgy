@@ -3,10 +3,12 @@ package org.acme.edgy.runtime.builtins;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
@@ -35,7 +37,6 @@ public abstract class AbstractJSONBodyModifier {
 
     protected <T> Future<T> applyStaticBody(ProxyContext proxyContext,
             Function<ProxyContext, Future<T>> sender) {
-        modifyContentTypeToJsonIfNeeded(proxyContext);
         Buffer buffer = Buffer.buffer();
         if (fullNewJson != null) { // allowing null for clearing the body
             buffer.appendBuffer(fullNewJson.toBuffer());
@@ -54,23 +55,18 @@ public abstract class AbstractJSONBodyModifier {
         }
 
         return readBodyBuffer(body).compose(bodyBuffer -> {
-            try {
-                JsonObject oldJson =
-                        bodyBuffer.length() > 0 ? bodyBuffer.toJsonObject() : new JsonObject();
-                JsonObject newJson = mapper.apply(proxyContext, oldJson);
+            JsonObject oldJson =
+                    bodyBuffer.length() > 0 ? bodyBuffer.toJsonObject() : new JsonObject();
+            JsonObject newJson = mapper.apply(proxyContext, oldJson);
 
-                Buffer replacingBuffer = Buffer.buffer();
-                if (newJson != null) { // allowing null for clearing the body
-                    replacingBuffer.appendBuffer(newJson.toBuffer());
-                }
-
-                modifyContentTypeToJsonIfNeeded(proxyContext);
-                getBody(proxyContext).setBody(Body.body(replacingBuffer));
-
-                return sender.apply(proxyContext);
-            } catch (Exception e) {
-                return Future.failedFuture(e); // 502
+            Buffer replacingBuffer = Buffer.buffer();
+            if (newJson != null) { // allowing null for clearing the body
+                replacingBuffer.appendBuffer(newJson.toBuffer());
             }
+
+            getBody(proxyContext).setBody(Body.body(replacingBuffer));
+
+            return sender.apply(proxyContext);
         });
     }
 
@@ -87,13 +83,6 @@ public abstract class AbstractJSONBodyModifier {
         return promise.future();
     }
 
-    private void modifyContentTypeToJsonIfNeeded(ProxyContext proxyContext) {
-        String contentType = getBody(proxyContext).headers().get(CONTENT_TYPE);
-        if (!APPLICATION_JSON.equals(contentType)) {
-            getBody(proxyContext).headers().set(CONTENT_TYPE, APPLICATION_JSON);
-        }
-    }
-
     // Returns the appropriate body accessor (request or response) for the concrete implementation
     protected abstract BodyAccessor getBody(ProxyContext proxyContext);
 
@@ -102,7 +91,5 @@ public abstract class AbstractJSONBodyModifier {
         Body getBody();
 
         void setBody(Body body);
-
-        MultiMap headers();
     }
 }

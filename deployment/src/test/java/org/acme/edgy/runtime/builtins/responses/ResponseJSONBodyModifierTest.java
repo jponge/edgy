@@ -15,6 +15,7 @@ import org.acme.edgy.runtime.api.RoutingConfiguration;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import io.vertx.core.json.JsonArray;
@@ -24,6 +25,8 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.containsString;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_REQUEST;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
 
 class ResponseJSONBodyModifierTest {
@@ -65,7 +68,11 @@ class ResponseJSONBodyModifierTest {
                             Origin.of("http://localhost:8081/test/replace-full"), PathMode.FIXED)
                                     .addResponseTransformer(new ResponseJSONBodyModifier(
                                             new JsonObject().put("replaced", "yes").put("arr",
-                                                    new JsonArray().add(1).add(2)))));
+                                                    new JsonArray().add(1).add(2)))))
+                    .addRoute(new Route("/invalid-json",
+                            Origin.of("http://localhost:8081/test/invalid-json"), PathMode.FIXED)
+                                    .addResponseTransformer(
+                                            new ResponseJSONBodyModifier(json -> json)));
         }
     }
 
@@ -108,8 +115,15 @@ class ResponseJSONBodyModifierTest {
 
         @GET
         @Path("/replace-full")
-        @jakarta.ws.rs.Produces(TEXT_PLAIN) // changes to application/json
+        @jakarta.ws.rs.Produces(APPLICATION_JSON)
         public String replaceFullEndpoint() {
+            return ORIGINAL_JSON;
+        }
+
+        @GET
+        @Path("/invalid-json")
+        @jakarta.ws.rs.Produces(TEXT_PLAIN)
+        public String invalidJson() {
             return "some text";
         }
     }
@@ -162,8 +176,14 @@ class ResponseJSONBodyModifierTest {
     @Test
     void test_replaceFull() {
         final String expectedResponseBody = "{\"replaced\":\"yes\",\"arr\":[1,2]}";
-        RestAssured.given().contentType(TEXT_PLAIN).get("/replace-full").then().statusCode(OK)
+        RestAssured.given().contentType(APPLICATION_JSON).get("/replace-full").then().statusCode(OK)
                 .body(is(expectedResponseBody)).and().contentType(APPLICATION_JSON).and()
                 .header(CONTENT_LENGTH, is(String.valueOf(expectedResponseBody.length())));
+    }
+
+    @Test
+    void test_dynamicFailsDueToInvalidJSONBody() {
+        RestAssured.given().contentType(APPLICATION_JSON).get("/invalid-json").then()
+                .statusCode(BAD_REQUEST).body(containsString("JSON"));
     }
 }
