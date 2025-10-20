@@ -1,5 +1,13 @@
 package org.acme.edgy.runtime;
 
+import java.util.List;
+import org.acme.edgy.runtime.api.Origin;
+import org.acme.edgy.runtime.api.PathMode;
+import org.acme.edgy.runtime.api.RequestTransformer;
+import org.acme.edgy.runtime.api.ResponseTransformer;
+import org.acme.edgy.runtime.api.Route;
+import org.acme.edgy.runtime.api.RoutingConfiguration;
+import org.acme.edgy.runtime.api.utils.QueryParamUtils;
 import io.quarkus.arc.DefaultBean;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -16,15 +24,14 @@ import io.vertx.uritemplate.Variables;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.UriBuilder;
 
-import java.util.List;
-
-import org.acme.edgy.runtime.api.Origin;
-import org.acme.edgy.runtime.api.PathMode;
-import org.acme.edgy.runtime.api.RequestTransformer;
-import org.acme.edgy.runtime.api.ResponseTransformer;
-import org.acme.edgy.runtime.api.Route;
-import org.acme.edgy.runtime.api.RoutingConfiguration;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.EMPTY_QUERY_VALUE;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_SEPARATOR_SYMBOL;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_SYMBOL;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_VALUE_SEPARATOR_SYMBOL;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.appendUriQueries;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.hasQuery;
 
 @ApplicationScoped
 @DefaultBean
@@ -34,6 +41,7 @@ public class RouterConfigurator {
     private static final String REQUEST_URI_AFTER_PREFIX = "__REQUEST_URI_AFTER_PREFIX__";
     private static final String REGEXP_ZERO_OR_MORE = "*";
     private static final String CURLY_BRACE = "{";
+
 
     @Inject
     Vertx vertx;
@@ -53,6 +61,9 @@ public class RouterConfigurator {
 
             rerouteProxyRequestAndResolveUriTemplate(proxy, origin.path(), route);
 
+            // to include query params from the original API Gateway URI
+            propagateQueryParams(proxy);
+
             // request transformers
             applyRequestTransformers(route.requestTransformers(), proxy);
 
@@ -61,6 +72,27 @@ public class RouterConfigurator {
 
             registerVertxRoute(router, route, proxy);
         }
+    }
+
+    private void propagateQueryParams(HttpProxy proxy) {
+        proxy.addInterceptor(new ProxyInterceptor() {
+            @Override
+            public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
+                ProxyRequest proxyRequest = context.request();
+                String originUri = proxyRequest.getURI();
+                String encodedQueryOfApiGatewayUri = context.request().proxiedRequest().query();
+                if (encodedQueryOfApiGatewayUri == null && !hasQuery(originUri)) {
+                    // no queries present
+                    return context.sendRequest();
+                }
+                if (encodedQueryOfApiGatewayUri != null) {
+                    // appends originalAPIGatewayURI query params into the originUri
+                    originUri = appendUriQueries(originUri, encodedQueryOfApiGatewayUri);
+                }
+                proxyRequest.setURI(originUri);
+                return context.sendRequest();
+            }
+        });
     }
 
     private boolean pathNeedsUriTemplateResolving(String path) {
