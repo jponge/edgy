@@ -1,6 +1,5 @@
 package org.acme.edgy.runtime;
 
-import java.util.List;
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.RequestTransformer;
@@ -25,13 +24,22 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import org.acme.edgy.runtime.api.Origin;
+import org.acme.edgy.runtime.api.PathMode;
+import org.acme.edgy.runtime.api.RequestTransformer;
+import org.acme.edgy.runtime.api.ResponseTransformer;
+import org.acme.edgy.runtime.api.Route;
+import org.acme.edgy.runtime.api.RoutingConfiguration;
 
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.EMPTY_QUERY_VALUE;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_SEPARATOR_SYMBOL;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_SYMBOL;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_VALUE_SEPARATOR_SYMBOL;
 import static org.acme.edgy.runtime.api.utils.QueryParamUtils.appendUriQueries;
 import static org.acme.edgy.runtime.api.utils.QueryParamUtils.hasQuery;
+import static org.acme.edgy.runtime.api.utils.SegmentUtils.extractSegmentValues;
+import static org.acme.edgy.runtime.api.utils.SegmentUtils.replaceSegmentsWithRegex;
 
 @ApplicationScoped
 @DefaultBean
@@ -41,7 +49,6 @@ public class RouterConfigurator {
     private static final String REQUEST_URI_AFTER_PREFIX = "__REQUEST_URI_AFTER_PREFIX__";
     private static final String REGEXP_ZERO_OR_MORE = "*";
     private static final String CURLY_BRACE = "{";
-
 
     @Inject
     Vertx vertx;
@@ -59,7 +66,7 @@ public class RouterConfigurator {
             HttpProxy proxy = HttpProxy.reverseProxy(httpClient)
                     .origin(origin.originRequestProvider()); // dynamically receive the origin
 
-            rerouteProxyRequestAndResolveUriTemplate(proxy, origin.path(), route);
+            rerouteProxyRequestAndResolveUriTemplate(proxy, route);
 
             // to include query params from the original API Gateway URI
             propagateQueryParams(proxy);
@@ -99,25 +106,31 @@ public class RouterConfigurator {
         return path.contains(CURLY_BRACE);
     }
 
-    private void rerouteProxyRequestAndResolveUriTemplate(HttpProxy proxy, String path, Route route) {
+    private void rerouteProxyRequestAndResolveUriTemplate(HttpProxy proxy, Route route) {
         proxy.addInterceptor(new ProxyInterceptor() {
             @Override
             public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
                 ProxyRequest proxyRequest = context.request();
-                if (!pathNeedsUriTemplateResolving(path)) {
-                    proxyRequest.setURI(path);
+                String originPath = route.origin().path();
+                if (!pathNeedsUriTemplateResolving(originPath)) {
+                    proxyRequest.setURI(originPath);
                     return context.sendRequest();
                 }
-                UriTemplate uriTemplate = UriTemplate.of(path);
+                UriTemplate uriTemplate = UriTemplate.of(originPath);
                 Variables variables = Variables.variables()
                         .set(REQUEST_URI, proxyRequest.getURI());
-                if (route.pathMode() == PathMode.PREFIX) {
+                if (route.pathMode() == PathMode.PARAMS) {
+                    extractSegmentValues(route.path(), proxyRequest.getURI())
+                            .forEach(variables::set);
+                } else if (route.pathMode() == PathMode.PREFIX) {
                     int starPos = route.path().indexOf(REGEXP_ZERO_OR_MORE);
-                    variables.set(REQUEST_URI_AFTER_PREFIX, proxyRequest.getURI().substring(starPos));
+                    variables.set(REQUEST_URI_AFTER_PREFIX,
+                            proxyRequest.getURI().substring(starPos));
                 }
                 proxyRequest.proxiedRequest().params().forEach(variables::set);
                 proxyRequest.setURI(uriTemplate.expandToString(variables));
                 return context.sendRequest();
+
             }
         });
     }
@@ -147,7 +160,8 @@ public class RouterConfigurator {
 
     private void registerVertxRoute(Router router, Route edgyRoute, HttpProxy proxy) {
         var vertxRoute = switch (edgyRoute.pathMode()) {
-            case FIXED, PREFIX, PARAMS -> router.route(edgyRoute.path());
+            case FIXED, PREFIX -> router.route(edgyRoute.path());
+            case PARAMS -> router.routeWithRegex(replaceSegmentsWithRegex(edgyRoute.path()));
             case REGEXP -> router.routeWithRegex(edgyRoute.path());
         };
         vertxRoute.handler(rc -> {
