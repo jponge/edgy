@@ -29,7 +29,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_REQUEST;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
 
-class ResponseJSONBodyModifierTest {
+class ResponseJsonObjectBodyModifierTest {
 
     private static final String ORIGINAL_JSON =
             "{\"1\":\"Lorem\",\"2\":\"Ipsum\",\"3\":[\"Dolor\",\"Sit\",\"Amet\"]}";
@@ -40,39 +40,41 @@ class ResponseJSONBodyModifierTest {
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/remove-field",
                     Origin.of("http://localhost:8081/test/remove-field"), PathMode.FIXED)
-                            .addResponseTransformer(new ResponseJSONBodyModifier(json -> {
+                            .addResponseTransformer(new ResponseJsonObjectBodyModifier(json -> {
                                 json.remove("2");
                                 return json;
                             })))
                     .addRoute(new Route("/modify-field",
                             Origin.of("http://localhost:8081/test/modify-field"), PathMode.FIXED)
-                                    .addResponseTransformer(new ResponseJSONBodyModifier(json -> {
-                                        json.put("1", "Changed");
-                                        return json;
-                                    })))
+                                    .addResponseTransformer(
+                                            new ResponseJsonObjectBodyModifier(json -> {
+                                                json.put("1", "Changed");
+                                                return json;
+                                            })))
                     .addRoute(new Route("/add-field",
                             Origin.of("http://localhost:8081/test/add-field"), PathMode.FIXED)
-                                    .addResponseTransformer(new ResponseJSONBodyModifier(json -> {
-                                        json.put("4", "NewVal");
-                                        return json;
-                                    })))
+                                    .addResponseTransformer(
+                                            new ResponseJsonObjectBodyModifier(json -> {
+                                                json.put("4", "NewVal");
+                                                return json;
+                                            })))
                     .addRoute(new Route("/set-null-dynamic",
                             Origin.of("http://localhost:8081/test/set-null-dynamic"),
                             PathMode.FIXED).addResponseTransformer(
-                                    new ResponseJSONBodyModifier(json -> null)))
+                                    new ResponseJsonObjectBodyModifier(json -> null)))
                     .addRoute(new Route("/set-null-static",
                             Origin.of("http://localhost:8081/test/set-null-static"), PathMode.FIXED)
                                     .addResponseTransformer(
-                                            new ResponseJSONBodyModifier((JsonObject) null)))
+                                            new ResponseJsonObjectBodyModifier((JsonObject) null)))
                     .addRoute(new Route("/replace-full",
                             Origin.of("http://localhost:8081/test/replace-full"), PathMode.FIXED)
-                                    .addResponseTransformer(new ResponseJSONBodyModifier(
+                                    .addResponseTransformer(new ResponseJsonObjectBodyModifier(
                                             new JsonObject().put("replaced", "yes").put("arr",
                                                     new JsonArray().add(1).add(2)))))
                     .addRoute(new Route("/invalid-json",
                             Origin.of("http://localhost:8081/test/invalid-json"), PathMode.FIXED)
                                     .addResponseTransformer(
-                                            new ResponseJSONBodyModifier(json -> json)));
+                                            new ResponseJsonObjectBodyModifier(json -> json)));
         }
     }
 

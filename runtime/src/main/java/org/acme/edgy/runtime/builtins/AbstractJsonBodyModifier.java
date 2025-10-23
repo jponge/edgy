@@ -3,34 +3,34 @@ package org.acme.edgy.runtime.builtins;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
 import io.vertx.core.Future;
-import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.DecodeException;
-import io.vertx.core.json.JsonObject;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
 
-import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
+/**
+ * Base abstraction for all JSON body modifiers that transform JSON content.
+ * 
+ * @param <I> Input JSON type
+ * @param <O> Output JSON type
+ */
+public abstract class AbstractJsonBodyModifier<I, O> {
 
-public abstract class AbstractJSONBodyModifier {
+    protected final BiFunction<ProxyContext, I, O> mapper;
+    private final O fullNewJson; // for optimization when replacing entire body
 
-    protected final BiFunction<ProxyContext, JsonObject, JsonObject> mapper;
-    private final JsonObject fullNewJson; // for optimization
-
-    protected AbstractJSONBodyModifier(BiFunction<ProxyContext, JsonObject, JsonObject> mapper) {
+    protected AbstractJsonBodyModifier(BiFunction<ProxyContext, I, O> mapper) {
         this.mapper = Objects.requireNonNull(mapper);
         this.fullNewJson = null;
     }
 
-    protected AbstractJSONBodyModifier(Function<JsonObject, JsonObject> jsonTransformer) {
+    protected AbstractJsonBodyModifier(Function<I, O> jsonTransformer) {
         this((proxyContext, body) -> jsonTransformer.apply(body));
     }
 
-    protected AbstractJSONBodyModifier(JsonObject body) {
+    protected AbstractJsonBodyModifier(O body) {
         this.mapper = null;
         this.fullNewJson = body;
     }
@@ -39,15 +39,15 @@ public abstract class AbstractJSONBodyModifier {
             Function<ProxyContext, Future<T>> sender) {
         Buffer buffer = Buffer.buffer();
         if (fullNewJson != null) { // allowing null for clearing the body
-            buffer.appendBuffer(fullNewJson.toBuffer());
+            buffer.appendBuffer(jsonToBuffer(fullNewJson));
         }
-        getBody(proxyContext).setBody(Body.body(buffer));
+        setBody(proxyContext, Body.body(buffer));
         return sender.apply(proxyContext);
     }
 
     protected <T> Future<T> applyDynamicBody(ProxyContext proxyContext,
             Function<ProxyContext, Future<T>> sender) {
-        Body body = getBody(proxyContext).getBody();
+        Body body = getBody(proxyContext);
 
         if (body == null) {
             // No body to transform, just send
@@ -55,16 +55,15 @@ public abstract class AbstractJSONBodyModifier {
         }
 
         return readBodyBuffer(body).compose(bodyBuffer -> {
-            JsonObject oldJson =
-                    bodyBuffer.length() > 0 ? bodyBuffer.toJsonObject() : new JsonObject();
-            JsonObject newJson = mapper.apply(proxyContext, oldJson);
+            I oldJson = bufferToInputJson(bodyBuffer);
+            O newJson = mapper.apply(proxyContext, oldJson);
 
             Buffer replacingBuffer = Buffer.buffer();
             if (newJson != null) { // allowing null for clearing the body
-                replacingBuffer.appendBuffer(newJson.toBuffer());
+                replacingBuffer.appendBuffer(jsonToBuffer(newJson));
             }
 
-            getBody(proxyContext).setBody(Body.body(replacingBuffer));
+            setBody(proxyContext, Body.body(replacingBuffer));
 
             return sender.apply(proxyContext);
         });
@@ -83,13 +82,11 @@ public abstract class AbstractJSONBodyModifier {
         return promise.future();
     }
 
-    // Returns the appropriate body accessor (request or response) for the concrete implementation
-    protected abstract BodyAccessor getBody(ProxyContext proxyContext);
+    protected abstract I bufferToInputJson(Buffer buffer) throws DecodeException;
 
-    // Interface to abstract access to request/response body and headers
-    protected interface BodyAccessor {
-        Body getBody();
+    protected abstract Buffer jsonToBuffer(O json);
 
-        void setBody(Body body);
-    }
+    protected abstract Body getBody(ProxyContext proxyContext);
+
+    protected abstract void setBody(ProxyContext proxyContext, Body body);
 }
