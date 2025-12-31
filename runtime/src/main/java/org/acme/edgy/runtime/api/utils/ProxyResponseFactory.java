@@ -4,13 +4,16 @@ import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_REQUEST;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.PAYLOAD_TOO_LARGE;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.REQUEST_TIMEOUT;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.SERVICE_UNAVAILABLE;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.TOO_MANY_REQUESTS;
+
 import java.util.Objects;
 import org.jboss.logging.Logger;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
-import io.vertx.httpproxy.ProxyRequest;
 import io.vertx.httpproxy.ProxyResponse;
 
 public interface ProxyResponseFactory {
@@ -28,9 +31,24 @@ public interface ProxyResponseFactory {
         return customResponseInRequestTransformer(context, BAD_REQUEST, message);
     }
 
+    static Future<ProxyResponse> timeoutInRequestTransformer(ProxyContext context,
+            String message) {
+        return customResponseInRequestTransformer(context, REQUEST_TIMEOUT, message);
+    }
+
     static Future<ProxyResponse> payloadTooLargeInRequestTransformer(ProxyContext context,
             String message) {
         return customResponseInRequestTransformer(context, PAYLOAD_TOO_LARGE, message);
+    }
+
+    static Future<ProxyResponse> tooManyRequestsInRequestTransformer(ProxyContext context,
+            String message) {
+        return customResponseInRequestTransformer(context, TOO_MANY_REQUESTS, message);
+    }
+
+    static Future<ProxyResponse> serviceUnavailableInRequestTransformer(ProxyContext context,
+            String message) {
+        return customResponseInRequestTransformer(context, SERVICE_UNAVAILABLE, message);
     }
 
     // Response Transformer Methods
@@ -47,6 +65,10 @@ public interface ProxyResponseFactory {
 
     static Future<Void> payloadTooLargeInResponseTransformer(ProxyContext context, String message) {
         return customResponseInResponseTransformer(context, PAYLOAD_TOO_LARGE, message);
+    }
+
+    static Future<Void> tooManyRequestsInResponseTransformer(ProxyContext context, String message) {
+        return customResponseInResponseTransformer(context, TOO_MANY_REQUESTS, message);
     }
 
     private static ProxyResponse buildResponse(ProxyResponse proxyResponse, int statusCode,
