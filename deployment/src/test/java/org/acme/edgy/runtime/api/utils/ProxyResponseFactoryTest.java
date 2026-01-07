@@ -74,13 +74,13 @@ class ProxyResponseFactoryTest {
 
             return new RoutingConfiguration()
                     .addRoute(new Route("/request-transformer",
-                            Origin.of("origin uri is never called"), PathMode.FIXED)
+                            Origin.of("origin-1", "origin uri is never called"), PathMode.FIXED)
                             .addRequestTransformer(requestTransformerInvokingBadRequestFactory)
                             .addRequestTransformer(requestAssertFailure)
                             .addResponseTransformer(responseAssertFailure))
                     .addRoute(new Route("/response-transformer",
-                            Origin.of("http://localhost:8081/test/response-transformer"),
-                            PathMode.FIXED).addResponseTransformer(responseAssertFailure)
+                            Origin.of("origin-2", "http://localhost:8081/test/response-transformer"),
+                                    PathMode.FIXED).addResponseTransformer(responseAssertFailure)
                                     .addResponseTransformer(
                                             responseTransformerInvokingBadRequestFactory));
         }

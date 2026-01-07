@@ -37,7 +37,7 @@ class ResponseContentLengthLimitGuardTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/content-length-limit",
-                    Origin.of("http://localhost:8081/test/content-length-limit"), PathMode.FIXED)
+                    Origin.of("origin-1", "http://localhost:8081/test/content-length-limit"), PathMode.FIXED)
                             .addResponseTransformer(
                                     new ResponseContentLengthLimitGuard(CONTENT_LENGTH_LIMIT)));
         }

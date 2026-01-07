@@ -32,7 +32,7 @@ class RequestHeaderAdderTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/hello", Origin.of("http://localhost:8081/test"), PathMode.FIXED)
+                    .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test"), PathMode.FIXED)
                             .addRequestTransformer(new RequestHeaderAdder(CUSTOM_HEADER_1, CUSTOM_HEADER_VALUE_1))
                             .addRequestTransformer(new RequestHeaderAdder(CUSTOM_HEADER_2, CUSTOM_HEADER_VALUE_2))
                     );

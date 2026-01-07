@@ -12,6 +12,7 @@ import jakarta.enterprise.inject.Produces;
 class StorkRoutingProvider {
     @Produces
     RoutingConfiguration basicRouting() {
-        return new RoutingConfiguration().addRoute(new Route("/test", Origin.of("stork://my-service/test/hello"), PathMode.FIXED));
+        return new RoutingConfiguration()
+                .addRoute(new Route("/test", Origin.of("origin-1", "stork://my-service/test/hello"), PathMode.FIXED));
     }
 }

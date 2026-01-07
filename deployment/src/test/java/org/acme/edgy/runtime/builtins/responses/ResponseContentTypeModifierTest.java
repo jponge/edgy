@@ -36,11 +36,11 @@ class ResponseContentTypeModifierTest {
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/json-to-plain",
-                            Origin.of("http://localhost:8081/test/json-to-plain"), PathMode.FIXED)
+                            Origin.of("origin-1", "http://localhost:8081/test/json-to-plain"), PathMode.FIXED)
                                     .addResponseTransformer(
                                             new ResponseContentTypeModifier(TEXT_PLAIN)))
                     .addRoute(new Route("/plain-to-json",
-                            Origin.of("http://localhost:8081/test/plain-to-json"), PathMode.FIXED)
+                            Origin.of("origin-2", "http://localhost:8081/test/plain-to-json"), PathMode.FIXED)
                                     .addResponseTransformer(
                                             new ResponseContentTypeModifier(APPLICATION_JSON)));
         }

@@ -34,30 +34,30 @@ class EdgySegmentParamsTest {
             return new RoutingConfiguration()
                     // simple segment params tests
                     .addRoute(new Route("/reverse/{a}/{b}",
-                            Origin.of("http://localhost:8081/test/{b}/{a}"), PathMode.PARAMS))
+                            Origin.of("origin-1", "http://localhost:8081/test/{b}/{a}"), PathMode.PARAMS))
                     .addRoute(new Route("/three/{segment}",
-                            Origin.of("http://localhost:8081/test/{segment}/{segment}/{segment}"),
-                            PathMode.PARAMS))
+                            Origin.of("origin-2", "http://localhost:8081/test/{segment}/{segment}/{segment}"),
+                                    PathMode.PARAMS))
                     .addRoute(new Route("/path-to-query/{1}/{2}",
-                            Origin.of("http://localhost:8081/test?first={1}&second={2}"),
-                            PathMode.PARAMS))
+                            Origin.of("origin-3", "http://localhost:8081/test?first={1}&second={2}"),
+                                    PathMode.PARAMS))
                     .addRoute(new Route("/query-to-path",
                             // not PathMode dependent
-                            Origin.of("http://localhost:8081/test/{b}/{a}"), PathMode.PARAMS))
+                            Origin.of("origin-4", "http://localhost:8081/test/{b}/{a}"), PathMode.PARAMS))
                     .addRoute(new Route("/escaped-regex/.*/{a}",
-                            Origin.of("http://localhost:8081/test/{a}"), PathMode.PARAMS))
+                            Origin.of("origin-5", "http://localhost:8081/test/{a}"), PathMode.PARAMS))
                     .addRoute(new Route("/joined/{a}-{b}",
-                            Origin.of("http://localhost:8081/test/joined/{b}-{a}"),
-                            PathMode.PARAMS))
+                            Origin.of("origin-6", "http://localhost:8081/test/joined/{b}-{a}"),
+                                    PathMode.PARAMS))
                     // regex segment params tests
                     .addRoute(new Route("/users/{<userId>\\d+}",
-                            Origin.of("http://localhost:8081/test/user-{userId}"), PathMode.PARAMS))
+                            Origin.of("origin-7", "http://localhost:8081/test/user-{userId}"), PathMode.PARAMS))
                     .addRoute(new Route("/files/{<hash>[a-f0-9]+}",
-                            Origin.of("http://localhost:8081/test/file/{hash}"), PathMode.PARAMS))
+                            Origin.of("origin-8", "http://localhost:8081/test/file/{hash}"), PathMode.PARAMS))
                     // mixed simple and regex segment params test
                     .addRoute(new Route("/mixed/{name}/order/{<orderId>\\d+}",
-                            Origin.of("http://localhost:8081/test/{name}/{orderId}"),
-                            PathMode.PARAMS));
+                            Origin.of("origin-9", "http://localhost:8081/test/{name}/{orderId}"),
+                                    PathMode.PARAMS));
         }
     }
 

@@ -26,8 +26,12 @@ public class EdgyUriTemplatesRewriteTest {
         @Produces
         RoutingConfiguration basicRouting() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/v1/*", Origin.of("http://localhost:8081/test/dump/{__REQUEST_URI__}"), PathMode.PREFIX))
-                    .addRoute(new Route("/v2/*", Origin.of("http://localhost:8081/test/dump/{__REQUEST_URI_AFTER_PREFIX__}"), PathMode.PREFIX))
+                    .addRoute(new Route("/v1/*",
+                            Origin.of("origin-1", "http://localhost:8081/test/dump/{__REQUEST_URI__}"),
+                            PathMode.PREFIX))
+                    .addRoute(new Route("/v2/*",
+                            Origin.of("origin-2", "http://localhost:8081/test/dump/{__REQUEST_URI_AFTER_PREFIX__}"),
+                            PathMode.PREFIX))
                     ;
         }
     }

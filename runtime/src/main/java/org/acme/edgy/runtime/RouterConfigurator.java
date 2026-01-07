@@ -1,16 +1,10 @@
 package org.acme.edgy.runtime;
 
-import org.acme.edgy.runtime.api.Origin;
-import org.acme.edgy.runtime.api.PathMode;
-import org.acme.edgy.runtime.api.RequestTransformer;
-import org.acme.edgy.runtime.api.ResponseTransformer;
-import org.acme.edgy.runtime.api.Route;
-import org.acme.edgy.runtime.api.RoutingConfiguration;
-import org.acme.edgy.runtime.api.utils.QueryParamUtils;
 import io.quarkus.arc.DefaultBean;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.proxy.handler.ProxyHandler;
 import io.vertx.httpproxy.HttpProxy;
@@ -23,12 +17,11 @@ import io.vertx.uritemplate.Variables;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.UriBuilder;
-import java.net.URI;
+
+import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.IntStream;
+import java.util.Map;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.RequestTransformer;
@@ -57,12 +50,27 @@ public class RouterConfigurator {
     RoutingConfiguration routingConfiguration;
 
     void configure(@Observes Router router) {
-        HttpClient httpClient = vertx.createHttpClient();
-
         // TODO this is a very early hacky start
+
+        final Map<String, Origin> origins = new HashMap<>();
 
         for (Route route : routingConfiguration.routes()) {
             Origin origin = route.origin();
+
+            // Track origin and check for conflicts
+            Origin existingOrigin = origins.get(origin.identifier());
+            boolean originAlreadyExists = existingOrigin != null;
+            if (originAlreadyExists && !existingOrigin.uri().equals(origin.uri())) {
+                throw new IllegalStateException(
+                        "Origin identifier '" + origin.identifier() + "' is already associated with a different URI: "
+                                + existingOrigin.uri() + " vs " + origin.uri());
+            }
+            if (!originAlreadyExists) {
+                origins.put(origin.identifier(), origin);
+            }
+
+            HttpClient httpClient = httpClientForOrigin(origin);
+
             HttpProxy proxy = HttpProxy.reverseProxy(httpClient)
                     .origin(origin.originRequestProvider()); // dynamically receive the origin
 
@@ -79,6 +87,20 @@ public class RouterConfigurator {
 
             registerVertxRoute(router, route, proxy);
         }
+
+    }
+
+    private HttpClient httpClientForOrigin(Origin origin) {
+        HttpClient existing = origin.httpClient();
+        if (existing != null) {
+            return existing;
+        }
+
+        HttpClientOptions options = new HttpClientOptions();
+        HttpClient httpClient = vertx.createHttpClient(options);
+
+        origin.setHttpClient(httpClient);
+        return httpClient;
     }
 
     private void propagateQueryParams(HttpProxy proxy) {

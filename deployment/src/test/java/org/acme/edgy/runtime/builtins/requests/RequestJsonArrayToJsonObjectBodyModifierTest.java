@@ -34,7 +34,7 @@ class RequestJsonArrayToJsonObjectBodyModifierTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/object-to-array",
-                    Origin.of("http://localhost:8081/test/object-to-array"), PathMode.FIXED)
+                    Origin.of("origin-1", "http://localhost:8081/test/object-to-array"), PathMode.FIXED)
                             .addRequestTransformer(
                                     new RequestJsonArrayToJsonObjectBodyModifier(json -> {
                                         JsonObject jsonObject = new JsonObject();
@@ -44,15 +44,15 @@ class RequestJsonArrayToJsonObjectBodyModifierTest {
                                         return jsonObject;
                                     })))
                     .addRoute(new Route("/array-to-brand-new-object",
-                            Origin.of("http://localhost:8081/test/array-to-brand-new-object"),
-                            PathMode.FIXED).addRequestTransformer(
+                            Origin.of("origin-2", "http://localhost:8081/test/array-to-brand-new-object"),
+                                    PathMode.FIXED).addRequestTransformer(
                                     new RequestJsonArrayToJsonObjectBodyModifier(json -> {
                                         JsonObject jsonObject = new JsonObject();
                                         jsonObject.put("key", "value");
                                         return jsonObject;
                                     })))
                     .addRoute(new Route("/array-to-empty",
-                            Origin.of("http://localhost:8081/test/array-to-empty"), PathMode.FIXED)
+                            Origin.of("origin-3", "http://localhost:8081/test/array-to-empty"), PathMode.FIXED)
                                     .addRequestTransformer(
                                             new RequestJsonArrayToJsonObjectBodyModifier(
                                                     json -> null)));

@@ -34,11 +34,13 @@ class ResponseHeaderModifierTest {
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/modify-header",
-                            Origin.of("http://localhost:8081/test/modify-header"), PathMode.FIXED)
+                                            Origin.of("origin-1", "http://localhost:8081/test/modify-header"),
+                                            PathMode.FIXED)
                                     .addResponseTransformer(new ResponseHeaderModifier(
                                             HEADER_NAME_TO_BE_CHANGED, MODIFIED_HEADER_VALUE)))
                     .addRoute(new Route("/no-header",
-                            Origin.of("http://localhost:8081/test/no-header"), PathMode.FIXED)
+                                            Origin.of("origin-2", "http://localhost:8081/test/no-header"),
+                                            PathMode.FIXED)
                                     .addResponseTransformer(new ResponseHeaderModifier(
                                             HEADER_NAME_TO_BE_CHANGED, MODIFIED_HEADER_VALUE)));
         }

@@ -35,7 +35,7 @@ class RequestJsonObjectToJsonArrayBodyModifierTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/object-to-array",
-                    Origin.of("http://localhost:8081/test/object-to-array"), PathMode.FIXED)
+                    Origin.of("origin-1", "http://localhost:8081/test/object-to-array"), PathMode.FIXED)
                             .addRequestTransformer(
                                     new RequestJsonObjectToJsonArrayBodyModifier(json -> {
                                         JsonArray jsonArray = new JsonArray();
@@ -45,8 +45,8 @@ class RequestJsonObjectToJsonArrayBodyModifierTest {
                                         return jsonArray;
                                     })))
                     .addRoute(new Route("/object-to-brand-new-array",
-                            Origin.of("http://localhost:8081/test/object-to-brand-new-array"),
-                            PathMode.FIXED).addRequestTransformer(
+                            Origin.of("origin-2", "http://localhost:8081/test/object-to-brand-new-array"),
+                                    PathMode.FIXED).addRequestTransformer(
                                     new RequestJsonObjectToJsonArrayBodyModifier(json -> {
                                         JsonArray jsonArray = new JsonArray();
                                         jsonArray.add("value1");
@@ -54,7 +54,7 @@ class RequestJsonObjectToJsonArrayBodyModifierTest {
                                         return jsonArray;
                                     })))
                     .addRoute(new Route("/object-to-empty",
-                            Origin.of("http://localhost:8081/test/object-to-empty"), PathMode.FIXED)
+                            Origin.of("origin-3", "http://localhost:8081/test/object-to-empty"), PathMode.FIXED)
                                     .addRequestTransformer(
                                             new RequestJsonObjectToJsonArrayBodyModifier(
                                                     json -> null)));
