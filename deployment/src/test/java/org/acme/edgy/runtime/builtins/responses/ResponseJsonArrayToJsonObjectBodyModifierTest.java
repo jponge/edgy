@@ -34,7 +34,7 @@ class ResponseJsonArrayToJsonObjectBodyModifierTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/array-to-object",
-                    Origin.of("http://localhost:8081/test/array-to-object"), PathMode.FIXED)
+                    Origin.of("origin-1", "http://localhost:8081/test/array-to-object"), PathMode.FIXED)
                             .addResponseTransformer(
                                     new ResponseJsonArrayToJsonObjectBodyModifier(json -> {
                                         JsonObject jsonObject = new JsonObject();
@@ -44,20 +44,20 @@ class ResponseJsonArrayToJsonObjectBodyModifierTest {
                                         return jsonObject;
                                     })))
                     .addRoute(new Route("/array-to-brand-new-object",
-                            Origin.of("http://localhost:8081/test/array-to-brand-new-object"),
-                            PathMode.FIXED).addResponseTransformer(
+                            Origin.of("origin-2", "http://localhost:8081/test/array-to-brand-new-object"),
+                                    PathMode.FIXED).addResponseTransformer(
                                     new ResponseJsonArrayToJsonObjectBodyModifier(json -> {
                                         JsonObject jsonObject = new JsonObject();
                                         jsonObject.put("key", "value");
                                         return jsonObject;
                                     })))
                     .addRoute(new Route("/array-to-empty",
-                            Origin.of("http://localhost:8081/test/array-to-empty"), PathMode.FIXED)
+                            Origin.of("origin-3", "http://localhost:8081/test/array-to-empty"), PathMode.FIXED)
                                     .addResponseTransformer(
                                             new ResponseJsonArrayToJsonObjectBodyModifier(
                                                     json -> null)))
                     .addRoute(new Route("/invalid-json",
-                            Origin.of("http://localhost:8081/test/invalid-json"), PathMode.FIXED)
+                            Origin.of("origin-4", "http://localhost:8081/test/invalid-json"), PathMode.FIXED)
                                     .addResponseTransformer(
                                             new ResponseJsonArrayToJsonObjectBodyModifier(json -> {
                                                 // Just transform to object for invalid JSON test

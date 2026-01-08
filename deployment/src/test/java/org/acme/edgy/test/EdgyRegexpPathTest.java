@@ -27,14 +27,14 @@ class EdgyRegexpPathTest {
         @Produces
         RoutingConfiguration basicRouting() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/[a-c]+/.*", Origin.of("http://localhost:8081/test"),
-                            REGEXP))
+                            .addRoute(new Route("/[a-c]+/.*", Origin.of("origin-1", "http://localhost:8081/test"),
+                                            REGEXP))
                     .addRoute(new Route("/user/[0-9]+/profile",
-                            Origin.of("http://localhost:8081/test"), REGEXP))
+                                            Origin.of("origin-2", "http://localhost:8081/test"), REGEXP))
                     .addRoute(new Route("/api/v[0-9]+/resource/[a-zA-Z0-9_-]+",
-                            Origin.of("http://localhost:8081/test"), REGEXP))
+                                            Origin.of("origin-3", "http://localhost:8081/test"), REGEXP))
                     .addRoute(new Route("/complex/([a-z]+)-(\\d{2,4})/item/(foo|bar)",
-                            Origin.of("http://localhost:8081/test"), REGEXP));
+                                            Origin.of("origin-4", "http://localhost:8081/test"), REGEXP));
         }
     }
 

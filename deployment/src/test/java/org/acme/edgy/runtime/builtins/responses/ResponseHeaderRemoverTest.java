@@ -32,7 +32,7 @@ class ResponseHeaderRemoverTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/hello", Origin.of("http://localhost:8081/test"), PathMode.FIXED)
+                    .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test"), PathMode.FIXED)
                             .addResponseTransformer(new ResponseHeaderRemover(CUSTOM_HEADER_1)));
         }
     }

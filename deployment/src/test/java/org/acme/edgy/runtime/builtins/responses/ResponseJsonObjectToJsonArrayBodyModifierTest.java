@@ -34,17 +34,17 @@ class ResponseJsonObjectToJsonArrayBodyModifierTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/object-to-array",
-                    Origin.of("http://localhost:8081/test/object-to-array"), PathMode.FIXED)
-                            .addResponseTransformer(
-                                    new ResponseJsonObjectToJsonArrayBodyModifier(json -> {
-                                        JsonArray jsonArray = new JsonArray();
-                                        // Extract values in order
-                                        json.fieldNames().stream().sorted()
-                                                .forEach(key -> jsonArray.add(json.getValue(key)));
-                                        return jsonArray;
-                                    })))
+                    Origin.of("origin-1", "http://localhost:8081/test/object-to-array"), PathMode.FIXED)
+                    .addResponseTransformer(
+                            new ResponseJsonObjectToJsonArrayBodyModifier(json -> {
+                                JsonArray jsonArray = new JsonArray();
+                                // Extract values in order
+                                json.fieldNames().stream().sorted()
+                                        .forEach(key -> jsonArray.add(json.getValue(key)));
+                                return jsonArray;
+                            })))
                     .addRoute(new Route("/object-to-brand-new-array",
-                            Origin.of("http://localhost:8081/test/object-to-brand-new-array"),
+                            Origin.of("origin-2", "http://localhost:8081/test/object-to-brand-new-array"),
                             PathMode.FIXED).addResponseTransformer(
                                     new ResponseJsonObjectToJsonArrayBodyModifier(json -> {
                                         JsonArray jsonArray = new JsonArray();
@@ -53,19 +53,19 @@ class ResponseJsonObjectToJsonArrayBodyModifierTest {
                                         return jsonArray;
                                     })))
                     .addRoute(new Route("/object-to-empty",
-                            Origin.of("http://localhost:8081/test/object-to-empty"), PathMode.FIXED)
-                                    .addResponseTransformer(
-                                            new ResponseJsonObjectToJsonArrayBodyModifier(
-                                                    json -> null)))
+                            Origin.of("origin-3", "http://localhost:8081/test/object-to-empty"), PathMode.FIXED)
+                            .addResponseTransformer(
+                                    new ResponseJsonObjectToJsonArrayBodyModifier(
+                                            json -> null)))
                     .addRoute(new Route("/invalid-json",
-                            Origin.of("http://localhost:8081/test/invalid-json"), PathMode.FIXED)
-                                    .addResponseTransformer(
-                                            new ResponseJsonObjectToJsonArrayBodyModifier(json -> {
-                                                // Just transform to array for invalid JSON test
-                                                JsonArray arr = new JsonArray();
-                                                arr.add(json);
-                                                return arr;
-                                            })));
+                            Origin.of("origin-4", "http://localhost:8081/test/invalid-json"), PathMode.FIXED)
+                            .addResponseTransformer(
+                                    new ResponseJsonObjectToJsonArrayBodyModifier(json -> {
+                                        // Just transform to array for invalid JSON test
+                                        JsonArray arr = new JsonArray();
+                                        arr.add(json);
+                                        return arr;
+                                    })));
         }
     }
 
@@ -101,8 +101,8 @@ class ResponseJsonObjectToJsonArrayBodyModifierTest {
     }
 
     @RegisterExtension
-    static final QuarkusUnitTest unitTest =
-            new QuarkusUnitTest().setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
+    static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+            .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
                     .addClasses(RoutingProvider.class, TestApi.class));
 
     @Test

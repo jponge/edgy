@@ -29,7 +29,7 @@ class RequestHttpMethodModifierTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/post-to-put",
-                    Origin.of("http://localhost:8081/test/post-to-put"), PathMode.FIXED)
+                    Origin.of("origin-1", "http://localhost:8081/test/post-to-put"), PathMode.FIXED)
                             .addRequestTransformer(new RequestHttpMethodModifier(HttpMethod.PUT)));
 
         }

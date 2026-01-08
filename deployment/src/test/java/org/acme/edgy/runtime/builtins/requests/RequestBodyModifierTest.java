@@ -38,11 +38,11 @@ class RequestBodyModifierTest {
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/modify-body",
-                            Origin.of("http://localhost:8081/test/modify-body"), PathMode.FIXED)
+                            Origin.of("origin-1", "http://localhost:8081/test/modify-body"), PathMode.FIXED)
                                     .addRequestTransformer(new RequestBodyModifier(
                                             Body.body(Buffer.buffer(MODIFIED_BODY)))))
                     .addRoute(new Route("/modify-null",
-                            Origin.of("http://localhost:8081/test/modify-null"), PathMode.FIXED)
+                            Origin.of("origin-2", "http://localhost:8081/test/modify-null"), PathMode.FIXED)
                                     .addRequestTransformer(new RequestBodyModifier((Body) null)));
         }
     }

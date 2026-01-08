@@ -63,8 +63,8 @@ class RequestQueryParameterAdderTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/values", Origin.of("http://localhost:8081/test/values"),
-                            PathMode.FIXED)
+                            .addRoute(new Route("/values", Origin.of("origin-1", "http://localhost:8081/test/values"),
+                                            PathMode.FIXED)
                                     .addRequestTransformer(new RequestQueryParameterAdder(
                                             QUERY_PARAM_KEY_1, QUERY_PARAM_VALUE_1))
                                     .addRequestTransformer(
@@ -75,7 +75,8 @@ class RequestQueryParameterAdderTest {
                                     .addRequestTransformer(new RequestQueryParameterAdder(
                                             QUERY_PARAM_KEY_2, QUERY_PARAM_VALUE_5)))
                     .addRoute(new Route("/no-values",
-                            Origin.of("http://localhost:8081/test/no-values"), PathMode.FIXED)
+                                            Origin.of("origin-2", "http://localhost:8081/test/no-values"),
+                                            PathMode.FIXED)
                                     .addRequestTransformer(
                                             new RequestQueryParameterAdder(QUERY_PARAM_KEY_1))
                                     .addRequestTransformer(new RequestQueryParameterAdder(
@@ -83,7 +84,8 @@ class RequestQueryParameterAdderTest {
                                     .addRequestTransformer(
                                             new RequestQueryParameterAdder(QUERY_PARAM_KEY_3)))
                     .addRoute(new Route("/query-params-in-origin-uri", Origin.of(
-                            "http://localhost:8081/test/query-params-in-origin-uri?existingParam=existingValue&"
+                                            "origin-3",
+                                            "http://localhost:8081/test/query-params-in-origin-uri?existingParam=existingValue&"
                                     + encodeQueryParamSinglePair(QUERY_PARAM_KEY_1,
                                             QUERY_PARAM_VALUE_1)),
                             PathMode.FIXED)
@@ -92,8 +94,8 @@ class RequestQueryParameterAdderTest {
                                     .addRequestTransformer(new RequestQueryParameterAdder(
                                             QUERY_PARAM_KEY_3, QUERY_PARAM_VALUE_4)))
                     .addRoute(new Route("/propagated-query-params",
-                            Origin.of("http://localhost:8081/test/propagated-query-params"),
-                            PathMode.FIXED)
+                                            Origin.of("origin-4", "http://localhost:8081/test/propagated-query-params"),
+                                            PathMode.FIXED)
                                     .addRequestTransformer(new RequestQueryParameterAdder(
                                             QUERY_PARAM_KEY_1, QUERY_PARAM_VALUE_4))
                                     .addRequestTransformer(new RequestQueryParameterAdder(
@@ -102,7 +104,8 @@ class RequestQueryParameterAdderTest {
                                             new RequestQueryParameterAdder(QUERY_PARAM_KEY_3)))
                     .addRoute(new Route("/propagated-query-params-and-query-params-in-origin-uri",
                             Origin.of(
-                                    "http://localhost:8081/test/propagated-query-params-and-query-params-in-origin-uri?existingParam=existingValue&"
+                                                            "origin-5",
+                                                            "http://localhost:8081/test/propagated-query-params-and-query-params-in-origin-uri?existingParam=existingValue&"
                                             + encodeQueryParamSinglePair(QUERY_PARAM_KEY_3,
                                                     QUERY_PARAM_VALUE_1)),
                             PathMode.FIXED)

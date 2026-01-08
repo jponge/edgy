@@ -1,9 +1,13 @@
 package org.acme.edgy.runtime.config;
 
+import java.util.Map;
+
+import io.quarkus.runtime.annotations.ConfigDocMapKey;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
+import io.smallrye.config.WithName;
 
 /**
  * Configuration for edgy.
@@ -23,4 +27,9 @@ public interface EdgyConfig {
      */
     @WithDefault("api")
     Mode mode();
+
+    @ConfigDocMapKey("origin-identifier")
+    @WithName("origin")
+    Map<String, EdgyOriginConfig> origins();
+
 }

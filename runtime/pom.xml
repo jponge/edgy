@@ -25,6 +25,10 @@
             <artifactId>quarkus-rest</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-tls-registry</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.smallrye.stork</groupId>
             <artifactId>stork-core</artifactId>
         </dependency>

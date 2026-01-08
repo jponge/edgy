@@ -51,19 +51,23 @@ class RequestQueryParameterRemoverTest {
         @Produces
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
-                    .addRoute(new Route("/some", Origin.of("http://localhost:8081/test/some"), PathMode.FIXED)
+                            .addRoute(new Route("/some", Origin.of("origin-1", "http://localhost:8081/test/some"),
+                                            PathMode.FIXED)
                         .addRequestTransformer(new RequestQueryParameterRemover(QUERY_PARAM_KEY_1, QUERY_PARAM_KEY_2)))
-                    .addRoute(new Route("/all", Origin.of("http://localhost:8081/test/all"), PathMode.FIXED)
+                            .addRoute(new Route("/all", Origin.of("origin-2", "http://localhost:8081/test/all"),
+                                            PathMode.FIXED)
                         .addRequestTransformer(new RequestQueryParameterRemover(QUERY_PARAM_KEY_1, QUERY_PARAM_KEY_2, QUERY_PARAM_KEY_3)))
-                    .addRoute(new Route("/none", Origin.of("http://localhost:8081/test/none"), PathMode.FIXED)
+                            .addRoute(new Route("/none", Origin.of("origin-3", "http://localhost:8081/test/none"),
+                                            PathMode.FIXED)
                             .addRequestTransformer(new RequestQueryParameterRemover(
                                     QUERY_PARAM_KEY_1, QUERY_PARAM_KEY_2)))
                     .addRoute(new Route("/no-query",
-                            Origin.of("http://localhost:8081/test/no-query"), PathMode.FIXED)
+                                            Origin.of("origin-4", "http://localhost:8081/test/no-query"),
+                                            PathMode.FIXED)
                                     .addRequestTransformer(new RequestQueryParameterRemover(
                                             QUERY_PARAM_KEY_1, QUERY_PARAM_KEY_2)))
                     .addRoute(new Route("/origin-query-params",
-                            Origin.of("http://localhost:8081/test/origin-query-params?"
+                                            Origin.of("origin-5", "http://localhost:8081/test/origin-query-params?"
                                     + String.join(QUERY_SEPARATOR_SYMBOL,
                                             encodeQueryParamSinglePair(QUERY_PARAM_KEY_1,
                                                     QUERY_PARAM_VALUE_1),
@@ -76,7 +80,8 @@ class RequestQueryParameterRemoverTest {
                                     new RequestQueryParameterRemover(QUERY_PARAM_KEY_2,
                                             QUERY_PARAM_KEY_3)))
                     .addRoute(new Route("/origin-query-params-with-api-gateway-queries", Origin.of(
-                            "http://localhost:8081/test/origin-query-params-with-api-gateway-queries?"
+                                            "origin-6",
+                                            "http://localhost:8081/test/origin-query-params-with-api-gateway-queries?"
                                     + String.join(QUERY_SEPARATOR_SYMBOL,
                                             encodeQueryParamSinglePair(QUERY_PARAM_KEY_1,
                                                     QUERY_PARAM_VALUE_1),
@@ -89,8 +94,9 @@ class RequestQueryParameterRemoverTest {
                                     new RequestQueryParameterRemover(QUERY_PARAM_KEY_2,
                                             QUERY_PARAM_KEY_3)))
                     .addRoute(new Route("/add-query-param-transformer",
-                            Origin.of("http://localhost:8081/test/add-query-param-transformer"),
-                            PathMode.FIXED)
+                                            Origin.of("origin-7",
+                                                            "http://localhost:8081/test/add-query-param-transformer"),
+                                            PathMode.FIXED)
                                     .addRequestTransformer(new RequestQueryParameterAdder(
                                             QUERY_PARAM_KEY_1, QUERY_PARAM_VALUE_1))
                                     .addRequestTransformer(

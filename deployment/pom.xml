@@ -25,6 +25,10 @@
             <artifactId>quarkus-rest-deployment</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-tls-registry-deployment</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.acme</groupId>
             <artifactId>edgy</artifactId>
             <version>${project.version}</version>
@@ -42,6 +46,11 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye.certs</groupId>
+            <artifactId>smallrye-certificate-generator-junit5</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
