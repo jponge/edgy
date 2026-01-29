@@ -1,7 +1,12 @@
 package org.acme.edgy.it.faulttolerance;
 
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_GATEWAY;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.REQUEST_TIMEOUT;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.SERVICE_UNAVAILABLE;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.TOO_MANY_REQUESTS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +24,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_GATEWAY;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.REQUEST_TIMEOUT;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.SERVICE_UNAVAILABLE;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.TOO_MANY_REQUESTS;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
 
 @QuarkusTest
 class FaultToleranceTest {

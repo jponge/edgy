@@ -1,18 +1,15 @@
 package org.acme.edgy.ssl;
 
-import io.quarkus.test.QuarkusUnitTest;
-import io.quarkus.tls.CertificateUpdatedEvent;
-import io.quarkus.tls.TlsConfiguration;
-import io.quarkus.tls.TlsConfigurationRegistry;
-import io.restassured.RestAssured;
-import io.smallrye.certs.Format;
-import io.smallrye.certs.junit5.Certificate;
-import io.smallrye.certs.junit5.Certificates;
+import static org.hamcrest.CoreMatchers.is;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_GATEWAY;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
@@ -27,10 +24,14 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_GATEWAY;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.tls.CertificateUpdatedEvent;
+import io.quarkus.tls.TlsConfiguration;
+import io.quarkus.tls.TlsConfigurationRegistry;
+import io.restassured.RestAssured;
+import io.smallrye.certs.Format;
+import io.smallrye.certs.junit5.Certificate;
+import io.smallrye.certs.junit5.Certificates;
 
 @Certificates(baseDir = "target/certs", certificates = {
         @Certificate(name = "reload-edgy", password = "password", formats = Format.PKCS12, client = true),

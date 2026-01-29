@@ -1,12 +1,13 @@
 package org.acme.edgy.runtime.builtins.requests;
 
+import java.util.Objects;
+import java.util.function.Function;
+
+import org.acme.edgy.runtime.api.RequestTransformer;
+
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
-import org.acme.edgy.runtime.api.RequestTransformer;
-
-import java.util.Objects;
-import java.util.function.Function;
 
 public class RequestHeaderAdder implements RequestTransformer {
 

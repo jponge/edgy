@@ -1,11 +1,11 @@
 package org.acme.edgy.it.stork;
 
-import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
-
 import java.util.Map;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 public class ConsulTestResource implements QuarkusTestResourceLifecycleManager {
 

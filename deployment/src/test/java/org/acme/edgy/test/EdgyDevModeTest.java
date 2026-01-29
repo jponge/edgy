@@ -1,9 +1,10 @@
 package org.acme.edgy.test;
 
-import io.quarkus.test.QuarkusDevModeTest;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import io.quarkus.test.QuarkusDevModeTest;
 
 public class EdgyDevModeTest {
 

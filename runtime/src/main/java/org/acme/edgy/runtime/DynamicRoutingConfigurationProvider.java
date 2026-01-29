@@ -3,6 +3,7 @@ package org.acme.edgy.runtime;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
+
 import org.acme.edgy.runtime.api.RoutingConfiguration;
 import org.acme.edgy.runtime.config.EdgyRoutes;
 import org.jboss.logging.Logger;

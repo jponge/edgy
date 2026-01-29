@@ -1,12 +1,15 @@
 package org.acme.edgy.runtime.builtins.responses;
 
-import io.quarkus.test.QuarkusUnitTest;
-import io.restassured.RestAssured;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
@@ -16,9 +19,9 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+
+import io.quarkus.test.QuarkusUnitTest;
+import io.restassured.RestAssured;
 
 class ResponseHeaderModifierTest {
 

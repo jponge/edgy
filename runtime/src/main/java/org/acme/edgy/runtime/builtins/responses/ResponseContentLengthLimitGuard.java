@@ -1,14 +1,15 @@
 package org.acme.edgy.runtime.builtins.responses;
 
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
+
 import java.util.Objects;
 import java.util.function.Function;
-import org.acme.edgy.runtime.api.RequestTransformer;
+
 import org.acme.edgy.runtime.api.ResponseTransformer;
 import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
+
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
-import io.vertx.httpproxy.ProxyResponse;
 import io.vertx.httpproxy.ProxyRequest;
 
 public class ResponseContentLengthLimitGuard implements ResponseTransformer {

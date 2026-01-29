@@ -1,16 +1,17 @@
 package org.acme.edgy.runtime.builtins.requests;
 
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.quarkus.test.QuarkusUnitTest;
-import io.restassured.RestAssured;
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
+import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.INTERNAL_SERVER_ERROR;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import java.util.HashMap;
-import java.util.Map;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
@@ -20,12 +21,11 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import io.quarkus.test.QuarkusUnitTest;
+import io.restassured.RestAssured;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.httpproxy.Body;
-import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
-import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.INTERNAL_SERVER_ERROR;
 
 class RequestBodyModifierTest {
 

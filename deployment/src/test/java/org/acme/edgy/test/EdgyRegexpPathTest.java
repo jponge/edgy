@@ -1,11 +1,15 @@
 package org.acme.edgy.test;
 
-import io.quarkus.test.QuarkusUnitTest;
-import io.restassured.RestAssured;
+import static org.acme.edgy.runtime.api.PathMode.REGEXP;
+import static org.hamcrest.Matchers.is;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.NOT_FOUND;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
@@ -14,10 +18,8 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static org.acme.edgy.runtime.api.PathMode.REGEXP;
-import static org.hamcrest.Matchers.is;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.NOT_FOUND;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+import io.quarkus.test.QuarkusUnitTest;
+import io.restassured.RestAssured;
 
 
 class EdgyRegexpPathTest {

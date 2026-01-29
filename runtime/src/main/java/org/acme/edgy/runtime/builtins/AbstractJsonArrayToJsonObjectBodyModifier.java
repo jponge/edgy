@@ -2,6 +2,7 @@ package org.acme.edgy.runtime.builtins;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;

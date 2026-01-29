@@ -1,15 +1,15 @@
 package org.acme.edgy.runtime.api.utils;
 
-import java.util.Map;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import static org.acme.edgy.runtime.api.utils.SegmentUtils.extractSegmentValues;
 import static org.acme.edgy.runtime.api.utils.SegmentUtils.replaceSegmentsWithRegex;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
 
 class SegmentUtilsTest {
 
