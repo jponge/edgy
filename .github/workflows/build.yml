@@ -29,7 +29,8 @@ concurrency:
 jobs:
   build:
     env:
-      MVN: ./mvnw --show-version --batch-mode --no-transfer-progress
+    # remove spotless:check when transfering to Quarkiverse
+      MVN: ./mvnw spotless:check --show-version --batch-mode --no-transfer-progress
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
