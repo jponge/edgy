@@ -22,6 +22,8 @@ import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
 
+import java.nio.charset.StandardCharsets;
+
 class ResponseContentTypeModifierTest {
 
     private record Payload(String hello) {
@@ -29,6 +31,7 @@ class ResponseContentTypeModifierTest {
 
     private static final Payload payloadObject = new Payload("world");
     private static final String TEXTIFIED_JSON_PAYLOAD = "{\"hello\":\"world\"}";
+    private static final String COPYRIGHT = "©";
 
     @ApplicationScoped
     static class RoutingProvider {
@@ -42,7 +45,11 @@ class ResponseContentTypeModifierTest {
                     .addRoute(new Route("/plain-to-json",
                             Origin.of("origin-2", "http://localhost:8081/test/plain-to-json"), PathMode.FIXED)
                                     .addResponseTransformer(
-                                            new ResponseContentTypeModifier(APPLICATION_JSON)));
+                                    new ResponseContentTypeModifier(APPLICATION_JSON)))
+                    .addRoute(new Route("/charset-transform",
+                            Origin.of("origin-3", "http://localhost:8081/test/charset-check-encoded"), PathMode.FIXED)
+                            .addResponseTransformer(
+                                    new ResponseContentTypeModifier("text/plain; charset=UTF-16BE")));
         }
     }
 
@@ -60,6 +67,13 @@ class ResponseContentTypeModifierTest {
         @jakarta.ws.rs.Produces(TEXT_PLAIN) // changes to application/json
         public RestResponse<String> plainToJson() {
             return RestResponse.ok(TEXTIFIED_JSON_PAYLOAD);
+        }
+
+        @GET
+        @Path("/charset-check-encoded")
+        @jakarta.ws.rs.Produces("text/plain; charset=ISO-8859-1")
+        public RestResponse<byte[]> charsetCheckEncoded() {
+            return RestResponse.ok(COPYRIGHT.getBytes(StandardCharsets.ISO_8859_1));
         }
     }
 
@@ -79,5 +93,17 @@ class ResponseContentTypeModifierTest {
         Payload actualPayload = RestAssured.given().get("/plain-to-json").then().statusCode(OK)
                 .and().contentType(APPLICATION_JSON).extract().as(Payload.class);
         assertEquals(payloadObject, actualPayload);
+    }
+
+    @Test
+    void test_contentLengthUpdatedAfterTranscode() {
+        assertEquals(1, COPYRIGHT.getBytes(StandardCharsets.ISO_8859_1).length);
+        assertEquals(2, COPYRIGHT.getBytes(StandardCharsets.UTF_16BE).length);
+        RestAssured.given()
+                .get("/charset-transform")
+                .then()
+                .statusCode(OK)
+                .contentType("text/plain; charset=UTF-16BE")
+                .body(is(COPYRIGHT));
     }
 }
