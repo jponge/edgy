@@ -1,5 +1,7 @@
 package org.acme.edgy.runtime.builtins.requests;
 
+import static jakarta.ws.rs.core.HttpHeaders.RETRY_AFTER;
+
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
@@ -61,9 +63,14 @@ public class RequestFaultToleranceApplier implements RequestTransformer {
                                     .message(throwable.getMessage())
                                     .sendResponseInRequestTransformer();
                         } else if (throwable instanceof RateLimitException) {
+                            RateLimitException rateLimitException = (RateLimitException) throwable;
+                            // clever way to ceil seconds without using floating point arithmetic
+                            String retryAfterValue = String
+                                    .valueOf((rateLimitException.getRetryAfterMillis() + 999) / 1000);
                             return ProxyErrorResponseBuilder.create(proxyContext)
                                     .tooManyRequests()
-                                    .message(throwable.getMessage())
+                                    .message(rateLimitException.getMessage())
+                                    .header(RETRY_AFTER, retryAfterValue)
                                     .sendResponseInRequestTransformer();
                         } else if (throwable instanceof CircuitBreakerOpenException) {
                             return ProxyErrorResponseBuilder.create(proxyContext)
