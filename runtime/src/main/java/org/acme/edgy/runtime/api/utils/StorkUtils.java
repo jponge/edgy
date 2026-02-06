@@ -8,13 +8,14 @@ import io.vertx.httpproxy.ProxyContext;
 
 public interface StorkUtils {
 
-    static Future<HttpClientRequest> storkFuture(String serviceName, ProxyContext proxyContext) {
+    static Future<HttpClientRequest> storkFuture(String serviceName, ProxyContext proxyContext, boolean useTls) {
         return Future.fromCompletionStage(
                 getInstance().getService(serviceName).selectInstance()
                         .convert().toCompletionStage())
                 .compose(serviceInstance -> proxyContext.client().request(new RequestOptions()
                         .setHost(serviceInstance.getHost())
-                        .setPort(serviceInstance.getPort())));
+                        .setPort(serviceInstance.getPort())
+                        .setSsl(useTls)));
     }
 
     private static Stork getInstance() {

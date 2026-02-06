@@ -32,8 +32,12 @@ class RoutingProvider {
     }
 
     private RoutingConfiguration storkRoutes(RoutingConfiguration routingConfiguration) {
-        return routingConfiguration.addRoute(
-                new Route("/test", Origin.of("stork-origin", "stork://my-service/test/hello"), PathMode.FIXED));
+        return routingConfiguration
+                .addRoute(new Route("/test", Origin.of("stork-origin", "stork://my-service/test/hello"),
+                        PathMode.FIXED))
+                .addRoute(new Route("/test-secured",
+                        Origin.of("secured-stork-origin", "storks://my-secured-service/test/hello"),
+                        PathMode.FIXED));
     }
 
     private RoutingConfiguration faultToleranceRoutes(RoutingConfiguration routingConfiguration) {

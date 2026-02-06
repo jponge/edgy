@@ -96,7 +96,7 @@ public final class Origin {
 
     public OriginRequestProvider originRequestProvider() {
         return proxyContext -> switch (protocol) {
-            case stork -> storkFuture(host, proxyContext);
+            case stork, storks -> storkFuture(host, proxyContext, protocol == Protocol.storks);
             case http, https -> proxyContext.client().request(new RequestOptions().setHost(host)
                     .setPort(port).setSsl(protocol == Protocol.https));
         };
@@ -107,7 +107,7 @@ public final class Origin {
     }
 
     public boolean supportsTls() {
-        return protocol == Protocol.https;
+        return protocol == Protocol.https || protocol == Protocol.storks;
     }
 
     @Override

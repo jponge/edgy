@@ -1,5 +1,5 @@
 package org.acme.edgy.runtime.api;
 
 enum Protocol {
-    http, https, stork;
+    http, https, stork, storks;
 }
