@@ -1,14 +1,14 @@
 package org.acme.edgy.runtime;
 
-import io.quarkus.runtime.ShutdownContext;
-import io.quarkus.runtime.annotations.Recorder;
-import io.vertx.core.http.HttpClient;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import io.quarkus.runtime.ShutdownContext;
+import io.quarkus.runtime.annotations.Recorder;
+import io.vertx.core.http.HttpClient;
 
 @Recorder
 public class EdgyRecorder {

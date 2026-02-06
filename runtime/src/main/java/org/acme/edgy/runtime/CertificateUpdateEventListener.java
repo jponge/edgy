@@ -1,14 +1,14 @@
 package org.acme.edgy.runtime;
 
+import jakarta.enterprise.event.Observes;
+
+import org.jboss.logging.Logger;
+
 import io.quarkus.tls.CertificateUpdatedEvent;
 import io.quarkus.tls.TlsConfiguration;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpClient;
-
-import jakarta.enterprise.event.Observes;
-
-import org.jboss.logging.Logger;
 
 public class CertificateUpdateEventListener {
 

@@ -1,12 +1,5 @@
 package org.acme.edgy.it.stork;
 
-import io.quarkus.test.common.WithTestResource;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import static io.restassured.RestAssured.given;
 import static org.acme.edgy.it.stork.StorkResourceApi.FIRST_SERVICE_PORT;
 import static org.acme.edgy.it.stork.StorkResourceApi.SECOND_SERVICE_PORT;
@@ -15,6 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.common.WithTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
 
 @QuarkusTest
 @WithTestResource(ConsulTestResource.class)

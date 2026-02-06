@@ -1,26 +1,25 @@
 package org.acme.edgy.it;
 
-import io.smallrye.faulttolerance.api.RateLimitType;
-import io.vertx.core.Future;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.httpproxy.Body;
-import io.vertx.httpproxy.ProxyResponse;
-import jakarta.enterprise.inject.Produces;
-
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.MOVED_PERMANENTLY;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.REQUEST_TIMEOUT;
 
 import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 
+import jakarta.enterprise.inject.Produces;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
-import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
 import org.acme.edgy.runtime.builtins.requests.RequestFaultToleranceApplier;
 import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
+
+import io.smallrye.faulttolerance.api.RateLimitType;
+import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.httpproxy.Body;
+import io.vertx.httpproxy.ProxyResponse;
 
 class RoutingProvider {
 

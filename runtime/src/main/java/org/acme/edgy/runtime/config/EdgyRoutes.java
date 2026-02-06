@@ -1,11 +1,11 @@
 package org.acme.edgy.runtime.config;
 
+import java.util.List;
+
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithParentName;
-
-import java.util.List;
 
 /**
  * Runtime-define routes.

@@ -1,29 +1,26 @@
 package org.acme.edgy.test;
 
-import io.quarkus.test.QuarkusUnitTest;
-import io.restassured.RestAssured;
-import jakarta.enterprise.context.ApplicationScoped;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.NOT_FOUND;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
-import org.jboss.resteasy.reactive.ResponseStatus;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.NOT_FOUND;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+
+import io.quarkus.test.QuarkusUnitTest;
+import io.restassured.RestAssured;
 
 class EdgySegmentParamsTest {
 

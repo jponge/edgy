@@ -1,36 +1,32 @@
 package org.acme.edgy.runtime.api.utils;
 
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.hamcrest.CoreMatchers.is;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_REQUEST;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.NOT_FOUND;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.RequestTransformer;
 import org.acme.edgy.runtime.api.ResponseTransformer;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
-import org.acme.edgy.runtime.builtins.requests.RequestHeaderAdder;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
 import io.quarkus.test.QuarkusUnitTest;
 import io.restassured.RestAssured;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServer;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Produces;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import static org.hamcrest.CoreMatchers.is;
 
 class ProxyResponseFactoryTest {
 

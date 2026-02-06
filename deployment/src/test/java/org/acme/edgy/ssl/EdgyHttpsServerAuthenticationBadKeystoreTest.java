@@ -1,5 +1,9 @@
 package org.acme.edgy.ssl;
 
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_GATEWAY;
+
+import jakarta.enterprise.inject.Produces;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
@@ -13,10 +17,6 @@ import io.restassured.RestAssured;
 import io.smallrye.certs.Format;
 import io.smallrye.certs.junit5.Certificate;
 import io.smallrye.certs.junit5.Certificates;
-
-import jakarta.enterprise.inject.Produces;
-
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_GATEWAY;
 
 @Certificates(baseDir = "target/certs", certificates = {
         @Certificate(name = "edgy", password = "password", formats = Format.PKCS12, client = true),

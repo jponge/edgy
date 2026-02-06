@@ -1,31 +1,5 @@
 package org.acme.edgy.runtime.builtins.requests;
 
-import io.quarkus.test.QuarkusUnitTest;
-import io.restassured.RestAssured;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Produces;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.UriInfo;
-
-import org.acme.edgy.runtime.api.Origin;
-import org.acme.edgy.runtime.api.PathMode;
-import org.acme.edgy.runtime.api.Route;
-import org.acme.edgy.runtime.api.RoutingConfiguration;
-import org.acme.edgy.runtime.api.utils.QueryParamUtils;
-import org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions;
-import org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions.QueryParamValueBeforeAndAfterDeserialization;
-import org.jboss.resteasy.reactive.RestResponse;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import java.util.List;
-import java.util.Map;
 import static org.acme.edgy.runtime.api.utils.QueryParamUtils.EMPTY_QUERY_VALUE;
 import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_SEPARATOR_SYMBOL;
 import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_VALUE_SEPARATOR_SYMBOL;
@@ -33,6 +7,32 @@ import static org.acme.edgy.runtime.api.utils.QueryParamUtils.urlEncode;
 import static org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions.assertQueryParams;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.Map;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
+
+import org.acme.edgy.runtime.api.Origin;
+import org.acme.edgy.runtime.api.PathMode;
+import org.acme.edgy.runtime.api.Route;
+import org.acme.edgy.runtime.api.RoutingConfiguration;
+import org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions;
+import org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions.QueryParamValueBeforeAndAfterDeserialization;
+import org.jboss.resteasy.reactive.RestResponse;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+
+import io.quarkus.test.QuarkusUnitTest;
+import io.restassured.RestAssured;
 
 class RequestQueryParameterRemoverTest {
 

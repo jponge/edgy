@@ -1,16 +1,21 @@
 package org.acme.edgy.runtime.builtins.requests;
 
-import io.quarkus.test.QuarkusUnitTest;
-import io.restassured.RestAssured;
-import io.smallrye.mutiny.Multi;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.EMPTY_QUERY_VALUE;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_VALUE_SEPARATOR_SYMBOL;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.urlEncode;
+import static org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions.QueryParamValueBeforeAndAfterDeserialization;
+import static org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions.assertQueryParams;
+import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+
+import java.util.List;
+import java.util.Map;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 
 import org.acme.edgy.runtime.api.Origin;
@@ -25,22 +30,8 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Stream;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.EMPTY_QUERY_VALUE;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.QUERY_VALUE_SEPARATOR_SYMBOL;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.urlEncode;
-import static org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions.assertQueryParams;
-import static org.acme.edgy.runtime.builtins.assertions.QueryParamAssertions.QueryParamValueBeforeAndAfterDeserialization;
-import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
+import io.quarkus.test.QuarkusUnitTest;
+import io.restassured.RestAssured;
 
 class RequestQueryParameterAdderTest {
 

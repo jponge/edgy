@@ -2,11 +2,12 @@ package org.acme.edgy.runtime.builtins.requests;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
 import org.acme.edgy.runtime.api.RequestTransformer;
 import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
 import org.acme.edgy.runtime.builtins.AbstractJsonObjectBodyModifier;
+
 import io.vertx.core.Future;
-import io.vertx.core.MultiMap;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.httpproxy.Body;

@@ -1,12 +1,6 @@
 package org.acme.edgy.deployment;
 
-import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
-import io.quarkus.deployment.annotations.BuildProducer;
-import io.quarkus.deployment.annotations.BuildStep;
-import io.quarkus.deployment.annotations.ExecutionTime;
-import io.quarkus.deployment.annotations.Record;
-import io.quarkus.deployment.builditem.FeatureBuildItem;
-import io.quarkus.deployment.builditem.ShutdownContextBuildItem;
+import java.util.function.BooleanSupplier;
 
 import org.acme.edgy.runtime.CertificateUpdateEventListener;
 import org.acme.edgy.runtime.DynamicRoutingConfigurationProvider;
@@ -14,7 +8,13 @@ import org.acme.edgy.runtime.EdgyRecorder;
 import org.acme.edgy.runtime.RouterConfigurator;
 import org.acme.edgy.runtime.config.EdgyConfig;
 
-import java.util.function.BooleanSupplier;
+import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
+import io.quarkus.deployment.annotations.BuildProducer;
+import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.ExecutionTime;
+import io.quarkus.deployment.annotations.Record;
+import io.quarkus.deployment.builditem.FeatureBuildItem;
+import io.quarkus.deployment.builditem.ShutdownContextBuildItem;
 
 class EdgyProcessor {
 

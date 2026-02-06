@@ -1,11 +1,12 @@
 package org.acme.edgy.test;
 
-import io.quarkus.test.QuarkusUnitTest;
-import io.restassured.RestAssured;
+import static org.hamcrest.Matchers.is;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
@@ -15,7 +16,8 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static org.hamcrest.Matchers.is;
+import io.quarkus.test.QuarkusUnitTest;
+import io.restassured.RestAssured;
 
 public class EdgyBasicTest {
 

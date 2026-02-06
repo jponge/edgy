@@ -2,16 +2,16 @@ package org.acme.edgy.it.stork;
 
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.NOT_FOUND;
 
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ServiceOptions;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.consul.ConsulClient;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
 
 @Path("/api/stork")
 class StorkResourceApi {

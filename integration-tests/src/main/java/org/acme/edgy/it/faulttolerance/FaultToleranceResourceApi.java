@@ -1,13 +1,15 @@
 package org.acme.edgy.it.faulttolerance;
 
-import io.smallrye.mutiny.Uni;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+
 import org.jboss.resteasy.reactive.RestResponse;
+
+import io.smallrye.mutiny.Uni;
 
 @Path("/api/fault-tolerance")
 class FaultToleranceResourceApi {

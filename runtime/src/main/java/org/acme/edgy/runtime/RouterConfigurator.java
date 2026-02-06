@@ -1,5 +1,28 @@
 package org.acme.edgy.runtime;
 
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.appendUriQueries;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.hasQuery;
+import static org.acme.edgy.runtime.api.utils.SegmentUtils.extractSegmentValues;
+import static org.acme.edgy.runtime.api.utils.SegmentUtils.replaceSegmentsWithRegex;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+
+import org.acme.edgy.runtime.api.Origin;
+import org.acme.edgy.runtime.api.PathMode;
+import org.acme.edgy.runtime.api.RequestTransformer;
+import org.acme.edgy.runtime.api.ResponseTransformer;
+import org.acme.edgy.runtime.api.Route;
+import org.acme.edgy.runtime.api.RoutingConfiguration;
+import org.acme.edgy.runtime.config.EdgyConfig;
+import org.acme.edgy.runtime.config.EdgyOriginConfig;
+import org.jboss.logging.Logger;
+
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.tls.TlsConfigurationRegistry;
@@ -17,28 +40,6 @@ import io.vertx.httpproxy.ProxyRequest;
 import io.vertx.httpproxy.ProxyResponse;
 import io.vertx.uritemplate.UriTemplate;
 import io.vertx.uritemplate.Variables;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
-import jakarta.inject.Inject;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.acme.edgy.runtime.api.Origin;
-import org.acme.edgy.runtime.api.PathMode;
-import org.acme.edgy.runtime.api.RequestTransformer;
-import org.acme.edgy.runtime.api.ResponseTransformer;
-import org.acme.edgy.runtime.api.Route;
-import org.acme.edgy.runtime.api.RoutingConfiguration;
-import org.acme.edgy.runtime.config.EdgyConfig;
-import org.acme.edgy.runtime.config.EdgyOriginConfig;
-import org.jboss.logging.Logger;
-
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.appendUriQueries;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.hasQuery;
-import static org.acme.edgy.runtime.api.utils.SegmentUtils.extractSegmentValues;
-import static org.acme.edgy.runtime.api.utils.SegmentUtils.replaceSegmentsWithRegex;
 
 @ApplicationScoped
 @DefaultBean

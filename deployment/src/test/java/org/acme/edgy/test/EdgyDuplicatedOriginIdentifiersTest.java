@@ -1,7 +1,9 @@
 package org.acme.edgy.test;
 
-import io.quarkus.test.QuarkusUnitTest;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import jakarta.enterprise.inject.Produces;
+
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.PathMode;
 import org.acme.edgy.runtime.api.Route;
@@ -11,7 +13,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import io.quarkus.test.QuarkusUnitTest;
 
 class EdgyDuplicatedOriginIdentifiersTest {
 

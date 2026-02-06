@@ -28,14 +28,17 @@ concurrency:
 
 jobs:
   build:
+    env:
+    # remove spotless:check when transfering to Quarkiverse
+      MVN: ./mvnw spotless:check --show-version --batch-mode --no-transfer-progress
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        java: [17, 21]
+        java: [17, 21, 25]
     name: Build on Java ${{ matrix.java }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v5
         with:
@@ -44,7 +47,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: ./mvnw -B install
+        run: $MVN install
 
       - name: Build with Maven (Native)
-        run: ./mvnw -B install -Dnative -Dquarkus.native.container-build -Dnative.surefire.skip
+        run: $MVN install -Dnative -Dquarkus.native.container-build -Dnative.surefire.skip

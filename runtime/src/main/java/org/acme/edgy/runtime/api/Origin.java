@@ -1,12 +1,12 @@
 package org.acme.edgy.runtime.api;
 
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.RequestOptions;
-import io.vertx.httpproxy.OriginRequestProvider;
+import static org.acme.edgy.runtime.api.utils.StorkUtils.storkFuture;
 
 import java.util.Objects;
 
-import static org.acme.edgy.runtime.api.utils.StorkUtils.storkFuture;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.RequestOptions;
+import io.vertx.httpproxy.OriginRequestProvider;
 
 public final class Origin {
 

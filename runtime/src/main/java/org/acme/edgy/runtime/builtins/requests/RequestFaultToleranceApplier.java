@@ -1,5 +1,17 @@
 package org.acme.edgy.runtime.builtins.requests;
 
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import jakarta.enterprise.util.TypeLiteral;
+
+import org.acme.edgy.runtime.api.RequestTransformer;
+import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
+import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
+import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
+
 import io.smallrye.faulttolerance.api.RateLimitException;
 import io.smallrye.faulttolerance.api.TypedGuard;
 import io.smallrye.faulttolerance.api.TypedGuard.Builder;
@@ -7,17 +19,6 @@ import io.vertx.core.Expectation;
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
-import jakarta.enterprise.util.TypeLiteral;
-
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
-import org.acme.edgy.runtime.api.RequestTransformer;
-import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
-import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
-import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
 
 public class RequestFaultToleranceApplier implements RequestTransformer {
 

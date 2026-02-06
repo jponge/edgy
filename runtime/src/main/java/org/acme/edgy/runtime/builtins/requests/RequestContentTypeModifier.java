@@ -1,20 +1,23 @@
 package org.acme.edgy.runtime.builtins.requests;
 
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.function.Function;
+
+import jakarta.ws.rs.core.MediaType;
+
 import org.acme.edgy.runtime.api.RequestTransformer;
+
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
-import jakarta.ws.rs.core.MediaType;
-
-import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
-import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
 
 public class RequestContentTypeModifier implements RequestTransformer {
     private static final String FALLBACK_CHARSET = StandardCharsets.UTF_8.toString();

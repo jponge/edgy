@@ -1,10 +1,11 @@
 package org.acme.edgy.runtime.builtins.responses;
 
-import io.vertx.core.Future;
-import io.vertx.httpproxy.ProxyContext;
+import java.util.function.Function;
+
 import org.acme.edgy.runtime.api.ResponseTransformer;
 
-import java.util.function.Function;
+import io.vertx.core.Future;
+import io.vertx.httpproxy.ProxyContext;
 
 public class ResponseHeaderAdder implements ResponseTransformer {
 

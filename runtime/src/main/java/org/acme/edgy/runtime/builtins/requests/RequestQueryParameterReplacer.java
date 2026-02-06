@@ -1,21 +1,23 @@
 package org.acme.edgy.runtime.builtins.requests;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.EMPTY_QUERY_VALUE;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.extractEncodedQueryNames;
+import static org.acme.edgy.runtime.api.utils.QueryParamUtils.urlEncode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
+
+import jakarta.ws.rs.core.UriBuilder;
+
 import org.acme.edgy.runtime.api.RequestTransformer;
 import org.acme.edgy.runtime.api.utils.QueryParamUtils;
+
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
-import jakarta.ws.rs.core.UriBuilder;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.EMPTY_QUERY_VALUE;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.extractEncodedQueryNames;
-import static org.acme.edgy.runtime.api.utils.QueryParamUtils.urlEncode;
 
 public class RequestQueryParameterReplacer implements RequestTransformer {
 
