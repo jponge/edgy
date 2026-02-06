@@ -1,5 +1,6 @@
 package org.acme.edgy.it.faulttolerance;
 
+import static jakarta.ws.rs.core.HttpHeaders.RETRY_AFTER;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_GATEWAY;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.OK;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.REQUEST_TIMEOUT;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 
 @QuarkusTest
 class FaultToleranceTest {
@@ -69,23 +71,31 @@ class FaultToleranceTest {
         long smoothWindowMillis = 1000L;
         long smoothWindowMillisWithOverhead = (long) (smoothWindowMillis * 1.05);
 
-        List<Callable<Integer>> tasks = new ArrayList<>(numberOfRequests);
+        List<Callable<Response>> tasks = new ArrayList<>(numberOfRequests);
         for (int i = 0; i < numberOfRequests; i++) {
-            tasks.add(() -> RestAssured.given().when().get("/rate-limit").getStatusCode());
+            tasks.add(() -> RestAssured.given().when().get("/rate-limit"));
         }
 
         long startTime = System.currentTimeMillis();
-        List<Future<Integer>> results = executorService.invokeAll(tasks);
+        List<Future<Response>> results = executorService.invokeAll(tasks);
         long duration = System.currentTimeMillis() - startTime;
 
         int countOfInBoundRequests = 0;
         int countOfRateLimitedRequests = 0;
 
-        for (Future<Integer> result : results) {
-            int statusCode = result.get();
+        for (Future<Response> result : results) {
+            Response response = result.get();
+            int statusCode = response.getStatusCode();
             switch (statusCode) {
                 case OK -> countOfInBoundRequests++;
-                case TOO_MANY_REQUESTS -> countOfRateLimitedRequests++;
+                case TOO_MANY_REQUESTS -> {
+                    countOfRateLimitedRequests++;
+                    String retryAfter = response.getHeader(RETRY_AFTER);
+                    assertTrue(retryAfter != null && !retryAfter.isEmpty(),
+                            "RETRY_AFTER header missing for TOO_MANY_REQUESTS response");
+                    assertEquals("1", retryAfter,
+                            "RETRY_AFTER header should be 1 second, but was: " + retryAfter);
+                }
                 default -> Assertions.fail("Unexpected status code: " + statusCode);
             }
         }
@@ -106,16 +116,16 @@ class FaultToleranceTest {
         CountDownLatch readyLatch = new CountDownLatch(bulkheadLimit);
         CountDownLatch blockLatch = new CountDownLatch(1);
 
-        List<Callable<Integer>> tasks = new ArrayList<>();
+        List<Callable<Response>> tasks = new ArrayList<>();
         for (int i = 0; i < numberOfRequests; i++) {
             tasks.add(() -> {
                 readyLatch.countDown();
                 blockLatch.await(5, TimeUnit.SECONDS);
-                return RestAssured.given().when().get("/bulkhead").getStatusCode();
+                return RestAssured.given().when().get("/bulkhead");
             });
         }
 
-        List<Future<Integer>> results = executorService.invokeAll(tasks);
+        List<Future<Response>> results = executorService.invokeAll(tasks);
         boolean saturated = readyLatch.await(2, TimeUnit.SECONDS);
         assertTrue(saturated, "Threads failed to start in time");
 
@@ -123,11 +133,12 @@ class FaultToleranceTest {
 
         int countOfSuccessful = 0;
         int countOfRejected = 0;
-        for (Future<Integer> result : results) {
-            switch (result.get()) {
+        for (Future<Response> result : results) {
+            int statusCode = result.get().getStatusCode();
+            switch (statusCode) {
                 case OK -> countOfSuccessful++;
                 case BAD_GATEWAY -> countOfRejected++;
-                default -> Assertions.fail("Unexpected status code from bulkhead: " + result.get());
+                default -> Assertions.fail("Unexpected status code from bulkhead: " + statusCode);
             }
         }
 
@@ -164,19 +175,19 @@ class FaultToleranceTest {
         // wait until circuit breaker transitions to HALF-OPEN state
         Thread.sleep(circuitBreakerDelaySeconds * 1000);
 
-        List<Callable<Integer>> tasks = new ArrayList<>(6);
+        List<Callable<Response>> tasks = new ArrayList<>(6);
         for (int i = 0; i < 6; i++) {
-            tasks.add(() -> RestAssured.given().when().get("/circuit-breaker").getStatusCode());
+            tasks.add(() -> RestAssured.given().when().get("/circuit-breaker"));
         }
-        List<Future<Integer>> results = executorService.invokeAll(tasks);
+        List<Future<Response>> results = executorService.invokeAll(tasks);
         // two succeds (200)
         // one fail on a server side (502)
         // three fail on a client side (503) => limit reached (successThreshold)
         int countOf200 = 0;
         int countOf502 = 0;
         int countOf503 = 0;
-        for (Future<Integer> result : results) {
-            int statusCode = result.get();
+        for (Future<Response> result : results) {
+            int statusCode = result.get().getStatusCode();
             switch (statusCode) {
                 case OK -> countOf200++;
                 case BAD_GATEWAY -> countOf502++;
@@ -203,8 +214,8 @@ class FaultToleranceTest {
         results = executorService.invokeAll(tasks);
         countOf200 = 0;
         countOf503 = 0;
-        for (Future<Integer> result : results) {
-            int statusCode = result.get();
+        for (Future<Response> result : results) {
+            int statusCode = result.get().getStatusCode();
             switch (statusCode) {
                 case OK -> countOf200++;
                 case SERVICE_UNAVAILABLE -> countOf503++;

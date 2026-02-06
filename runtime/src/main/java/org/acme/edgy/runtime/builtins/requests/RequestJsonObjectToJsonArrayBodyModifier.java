@@ -4,7 +4,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.acme.edgy.runtime.api.RequestTransformer;
-import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
+import org.acme.edgy.runtime.api.utils.ProxyErrorResponseBuilder;
 import org.acme.edgy.runtime.builtins.AbstractJsonObjectToJsonArrayBodyModifier;
 
 import io.vertx.core.Future;
@@ -36,8 +36,10 @@ public class RequestJsonObjectToJsonArrayBodyModifier
     public Future<ProxyResponse> apply(ProxyContext proxyContext) {
         return applyDynamicBody(proxyContext, ProxyContext::sendRequest).recover(throwable -> {
             if (throwable instanceof DecodeException) {
-                return ProxyResponseFactory.badRequestInRequestTransformer(proxyContext,
-                        throwable.getMessage());
+                return ProxyErrorResponseBuilder.create(proxyContext)
+                        .badRequest()
+                        .message(throwable.getMessage())
+                        .sendResponseInRequestTransformer();
             }
             return Future.failedFuture(throwable);
         });

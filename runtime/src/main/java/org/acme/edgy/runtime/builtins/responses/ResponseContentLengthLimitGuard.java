@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import org.acme.edgy.runtime.api.ResponseTransformer;
-import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
+import org.acme.edgy.runtime.api.utils.ProxyErrorResponseBuilder;
 
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
@@ -14,8 +14,7 @@ import io.vertx.httpproxy.ProxyRequest;
 
 public class ResponseContentLengthLimitGuard implements ResponseTransformer {
 
-    private static final String ERROR_MESSAGE_TEMPLATE =
-            "Response content length %d exceeds the limit of %d";
+    private static final String ERROR_MESSAGE_TEMPLATE = "Response content length %d exceeds the limit of %d";
 
     private final Function<ProxyContext, Long> mapper;
 
@@ -34,11 +33,12 @@ public class ResponseContentLengthLimitGuard implements ResponseTransformer {
         long actualContentLength = Long.parseLong(request.headers().get(CONTENT_LENGTH));
 
         if (actualContentLength > contentLengthLimit) {
-            return ProxyResponseFactory.payloadTooLargeInResponseTransformer(proxyContext,
-                    ERROR_MESSAGE_TEMPLATE.formatted(actualContentLength, contentLengthLimit));
+            return ProxyErrorResponseBuilder.create(proxyContext)
+                    .payloadTooLarge()
+                    .message(ERROR_MESSAGE_TEMPLATE.formatted(actualContentLength, contentLengthLimit))
+                    .sendResponseInResponseTransformer();
         }
         return proxyContext.sendResponse();
     }
-
 
 }

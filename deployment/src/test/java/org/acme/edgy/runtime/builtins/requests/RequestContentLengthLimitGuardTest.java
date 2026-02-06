@@ -32,8 +32,8 @@ class RequestContentLengthLimitGuardTest {
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/content-length-limit",
                     Origin.of("origin-1", "http://localhost:8081/test/content-length-limit"), PathMode.FIXED)
-                            .addRequestTransformer(
-                                    new RequestContentLengthLimitGuard(CONTENT_LENGTH_LIMIT)));
+                    .addRequestTransformer(
+                            new RequestContentLengthLimitGuard(CONTENT_LENGTH_LIMIT)));
         }
     }
 
@@ -47,8 +47,8 @@ class RequestContentLengthLimitGuardTest {
     }
 
     @RegisterExtension
-    static final QuarkusUnitTest unitTest =
-            new QuarkusUnitTest().setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
+    static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+            .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
                     .addClasses(RoutingProvider.class, TestApi.class));
 
     @Test

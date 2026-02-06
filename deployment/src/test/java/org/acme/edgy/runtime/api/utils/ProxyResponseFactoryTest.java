@@ -4,7 +4,6 @@ import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.hamcrest.CoreMatchers.is;
 import static org.jboss.resteasy.reactive.RestResponse.StatusCode.BAD_REQUEST;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -28,9 +27,8 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
-class ProxyResponseFactoryTest {
+class ProxyErrorResponseBuilderTest {
 
-    @ApplicationScoped
     static class RoutingProvider {
 
         @Produces
@@ -50,35 +48,37 @@ class ProxyResponseFactoryTest {
                 }
             };
 
-            ResponseTransformer responseTransformerInvokingBadRequestFactory =
-                    new ResponseTransformer() {
-                        @Override
-                        public Future<Void> apply(ProxyContext context) {
-                            return ProxyResponseFactory.badRequestInResponseTransformer(context,
-                                    "Bad Request");
-                        }
-                    };
+            ResponseTransformer responseTransformerInvokingBadRequest = new ResponseTransformer() {
+                @Override
+                public Future<Void> apply(ProxyContext context) {
+                    return ProxyErrorResponseBuilder.create(context)
+                            .badRequest()
+                            .message("Bad Request")
+                            .sendResponseInResponseTransformer();
+                }
+            };
 
-            RequestTransformer requestTransformerInvokingBadRequestFactory =
-                    new RequestTransformer() {
-                        @Override
-                        public Future<ProxyResponse> apply(ProxyContext context) {
-                            return ProxyResponseFactory.badRequestInRequestTransformer(context,
-                                    "Bad Request");
-                        }
-                    };
+            RequestTransformer requestTransformerInvokingBadRequest = new RequestTransformer() {
+                @Override
+                public Future<ProxyResponse> apply(ProxyContext context) {
+                    return ProxyErrorResponseBuilder.create(context)
+                            .badRequest()
+                            .message("Bad Request")
+                            .sendResponseInRequestTransformer();
+                }
+            };
 
             return new RoutingConfiguration()
                     .addRoute(new Route("/request-transformer",
                             Origin.of("origin-1", "origin uri is never called"), PathMode.FIXED)
-                            .addRequestTransformer(requestTransformerInvokingBadRequestFactory)
+                            .addRequestTransformer(requestTransformerInvokingBadRequest)
                             .addRequestTransformer(requestAssertFailure)
                             .addResponseTransformer(responseAssertFailure))
                     .addRoute(new Route("/response-transformer",
                             Origin.of("origin-2", "http://localhost:8081/test/response-transformer"),
-                                    PathMode.FIXED).addResponseTransformer(responseAssertFailure)
-                                    .addResponseTransformer(
-                                            responseTransformerInvokingBadRequestFactory));
+                            PathMode.FIXED).addResponseTransformer(responseAssertFailure)
+                            .addResponseTransformer(
+                                    responseTransformerInvokingBadRequest));
         }
     }
 

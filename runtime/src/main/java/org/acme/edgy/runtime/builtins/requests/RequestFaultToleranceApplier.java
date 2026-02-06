@@ -1,5 +1,7 @@
 package org.acme.edgy.runtime.builtins.requests;
 
+import static jakarta.ws.rs.core.HttpHeaders.RETRY_AFTER;
+
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
@@ -8,7 +10,7 @@ import java.util.function.Function;
 import jakarta.enterprise.util.TypeLiteral;
 
 import org.acme.edgy.runtime.api.RequestTransformer;
-import org.acme.edgy.runtime.api.utils.ProxyResponseFactory;
+import org.acme.edgy.runtime.api.utils.ProxyErrorResponseBuilder;
 import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
 import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
 
@@ -54,16 +56,27 @@ public class RequestFaultToleranceApplier implements RequestTransformer {
     public Future<ProxyResponse> apply(ProxyContext proxyContext) {
         try {
             return getGuard(proxyContext).call(() -> proxyContext.sendRequest().expecting(expectation))
-                            .recover(throwable -> {
+                    .recover(throwable -> {
                         if (throwable instanceof TimeoutException) {
-                            return ProxyResponseFactory.timeoutInRequestTransformer(proxyContext,
-                                    throwable.getMessage());
+                            return ProxyErrorResponseBuilder.create(proxyContext)
+                                    .timeout()
+                                    .message(throwable.getMessage())
+                                    .sendResponseInRequestTransformer();
                         } else if (throwable instanceof RateLimitException) {
-                            return ProxyResponseFactory.tooManyRequestsInRequestTransformer(proxyContext,
-                                    throwable.getMessage());
+                            RateLimitException rateLimitException = (RateLimitException) throwable;
+                            // clever way to ceil seconds without using floating point arithmetic
+                            String retryAfterValue = String
+                                    .valueOf((rateLimitException.getRetryAfterMillis() + 999) / 1000);
+                            return ProxyErrorResponseBuilder.create(proxyContext)
+                                    .tooManyRequests()
+                                    .message(rateLimitException.getMessage())
+                                    .header(RETRY_AFTER, retryAfterValue)
+                                    .sendResponseInRequestTransformer();
                         } else if (throwable instanceof CircuitBreakerOpenException) {
-                            return ProxyResponseFactory.serviceUnavailableInRequestTransformer(proxyContext,
-                                    throwable.getMessage());
+                            return ProxyErrorResponseBuilder.create(proxyContext)
+                                    .serviceUnavailable()
+                                    .message(throwable.getMessage())
+                                    .sendResponseInRequestTransformer();
                         }
                         // will transform to 502 Bad Gateway (includes expectation failures)
                         return Future.failedFuture(throwable);
