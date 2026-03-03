@@ -19,6 +19,7 @@ import org.acme.edgy.runtime.api.RequestTransformer;
 import org.acme.edgy.runtime.api.ResponseTransformer;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
+import org.acme.edgy.runtime.api.RoutingPredicate;
 import org.acme.edgy.runtime.config.EdgyConfig;
 import org.acme.edgy.runtime.config.EdgyOriginConfig;
 import org.jboss.logging.Logger;
@@ -239,9 +240,17 @@ public class RouterConfigurator {
             case PARAMS -> router.routeWithRegex(replaceSegmentsWithRegex(edgyRoute.path()));
             case REGEXP -> router.routeWithRegex(edgyRoute.path());
         };
+
+        ProxyHandler proxyHandler = ProxyHandler.create(proxy);
+        List<RoutingPredicate> predicates = edgyRoute.predicates();
+        if (predicates.isEmpty()) {
+            vertxRoute.handler(proxyHandler);
+            return;
+        }
+
         vertxRoute.handler(rc -> {
-            if (edgyRoute.predicates().stream().allMatch(predicate -> predicate.test(rc))) {
-                ProxyHandler.create(proxy).handle(rc);
+            if (predicates.stream().allMatch(predicate -> predicate.test(rc))) {
+                proxyHandler.handle(rc);
                 return;
             }
             // if the predicates do not match, it will sequentially try the next route (with
