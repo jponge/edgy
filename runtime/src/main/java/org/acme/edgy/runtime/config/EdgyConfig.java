@@ -1,6 +1,7 @@
 package org.acme.edgy.runtime.config;
 
 import java.util.Map;
+import java.util.Optional;
 
 import io.quarkus.runtime.annotations.ConfigDocMapKey;
 import io.quarkus.runtime.annotations.ConfigPhase;
@@ -31,5 +32,18 @@ public interface EdgyConfig {
     @ConfigDocMapKey("origin-identifier")
     @WithName("origin")
     Map<String, EdgyOriginConfig> origins();
+
+    /**
+     * Tracing configuration.
+     */
+    TracingConfig tracing();
+
+    interface TracingConfig {
+
+        /**
+         * Whether to enable tracing.
+         */
+        Optional<Boolean> enabled();
+    }
 
 }

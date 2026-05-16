@@ -60,6 +60,7 @@
                             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                             <maven.home>${maven.home}</maven.home>
                             <maven.repo>${settings.localRepository}</maven.repo>
+                            <project.quarkus.version>${quarkus.version}</project.quarkus.version>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
