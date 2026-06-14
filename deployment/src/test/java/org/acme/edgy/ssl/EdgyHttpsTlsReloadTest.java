@@ -57,8 +57,7 @@ class EdgyHttpsTlsReloadTest {
             .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
                     .addClasses(HttpsServer.class, RoutingProvider.class))
             .overrideRuntimeConfigKey("loc", temp.getAbsolutePath())
-            .overrideConfigKey("edgy.origin.origin-1.tls-configuration-name",
-                    TLS_BUCKET_NAME)
+            .overrideRuntimeConfigKey("edgy.origin.origin-1.tls-configuration-name", TLS_BUCKET_NAME)
             .overrideRuntimeConfigKey("quarkus.tls." + TLS_BUCKET_NAME + ".key-store.p12.path",
                     temp.getAbsolutePath() + "/tls.p12")
             .overrideRuntimeConfigKey("quarkus.tls." + TLS_BUCKET_NAME + ".key-store.p12.password",

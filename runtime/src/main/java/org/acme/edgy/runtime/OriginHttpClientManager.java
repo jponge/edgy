@@ -9,8 +9,8 @@ import java.util.Map;
 import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
-import org.acme.edgy.runtime.config.EdgyConfig;
 import org.acme.edgy.runtime.config.EdgyOriginConfig;
+import org.acme.edgy.runtime.config.EdgyRuntimeConfig;
 import org.jboss.logging.Logger;
 
 import io.quarkus.runtime.configuration.ConfigurationException;
@@ -30,13 +30,13 @@ public class OriginHttpClientManager {
 
     private final Vertx vertx;
     private final TlsConfigurationRegistry tlsConfigurationRegistry;
-    private final EdgyConfig edgyConfig;
+    private final EdgyRuntimeConfig edgyRuntimeConfig;
 
     OriginHttpClientManager(Vertx vertx, TlsConfigurationRegistry tlsConfigurationRegistry,
-            EdgyConfig edgyConfig) {
+            EdgyRuntimeConfig edgyRuntimeConfig) {
         this.vertx = vertx;
         this.tlsConfigurationRegistry = tlsConfigurationRegistry;
-        this.edgyConfig = edgyConfig;
+        this.edgyRuntimeConfig = edgyRuntimeConfig;
     }
 
     public HttpClient getOrCreateHttpClient(Origin origin) {
@@ -57,7 +57,7 @@ public class OriginHttpClientManager {
         }
 
         HttpClientOptions options = new HttpClientOptions();
-        EdgyOriginConfig originConfig = edgyConfig.origins().get(origin.identifier());
+        EdgyOriginConfig originConfig = edgyRuntimeConfig.origins().get(origin.identifier());
         if (originConfig != null) {
             configureHttpClientOptions(options, originConfig);
         }

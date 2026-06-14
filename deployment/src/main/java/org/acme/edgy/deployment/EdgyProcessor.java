@@ -6,7 +6,7 @@ import org.acme.edgy.runtime.CertificateUpdateEventListener;
 import org.acme.edgy.runtime.DynamicRoutingConfigurationProvider;
 import org.acme.edgy.runtime.OriginHttpClientManager;
 import org.acme.edgy.runtime.RouterConfigurator;
-import org.acme.edgy.runtime.config.EdgyConfig;
+import org.acme.edgy.runtime.config.EdgyBuildTimeConfig;
 import org.acme.edgy.runtime.logging.LoggingProxyObserver;
 import org.acme.edgy.runtime.metrics.MicrometerMetricsProxyObserver;
 import org.acme.edgy.runtime.tracing.OTelTracingProxyObserver;
@@ -45,16 +45,16 @@ class EdgyProcessor {
 
     static class IsDynamicallyConfigured implements BooleanSupplier {
 
-        EdgyConfig config;
+        EdgyBuildTimeConfig config;
 
         @Override
         public boolean getAsBoolean() {
-            return config.mode() == EdgyConfig.Mode.CONFIGURATION;
+            return config.mode() == EdgyBuildTimeConfig.Mode.CONFIGURATION;
         }
     }
 
     @BuildStep
-    void setupTracingObserver(EdgyConfig config, Capabilities capabilities,
+    void setupTracingObserver(EdgyBuildTimeConfig config, Capabilities capabilities,
             BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         boolean otelPresent = capabilities.isPresent(Capability.OPENTELEMETRY_TRACER);
         boolean enabled = config.tracing().enabled().orElse(otelPresent);
@@ -75,7 +75,7 @@ class EdgyProcessor {
     }
 
     @BuildStep
-    void setupMetricsObserver(EdgyConfig config, Capabilities capabilities,
+    void setupMetricsObserver(EdgyBuildTimeConfig config, Capabilities capabilities,
             BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         boolean metricsPresent = capabilities.isPresent(Capability.METRICS);
         boolean enabled = config.metrics().enabled().orElse(metricsPresent);
@@ -86,7 +86,7 @@ class EdgyProcessor {
     }
 
     @BuildStep
-    void setupLoggingObserver(EdgyConfig config,
+    void setupLoggingObserver(EdgyBuildTimeConfig config,
             BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         if (!config.logging().enabled()) {
             return;
