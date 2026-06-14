@@ -38,7 +38,7 @@ class ResponseContentTypeModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/json-to-plain",
                             Origin.of("origin-1", "http://localhost:8081/test/json-to-plain"))
                                     .addResponseTransformer(
@@ -50,7 +50,7 @@ class ResponseContentTypeModifierTest {
                     .addRoute(new Route("/charset-transform",
                             Origin.of("origin-3", "http://localhost:8081/test/charset-check-encoded"))
                             .addResponseTransformer(
-                                    new ResponseContentTypeModifier("text/plain; charset=UTF-16BE")));
+                                    new ResponseContentTypeModifier("text/plain; charset=UTF-16BE"))).build();
         }
     }
 

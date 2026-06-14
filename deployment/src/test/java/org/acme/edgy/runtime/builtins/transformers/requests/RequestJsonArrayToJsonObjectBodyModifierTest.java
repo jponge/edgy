@@ -34,7 +34,7 @@ class RequestJsonArrayToJsonObjectBodyModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration().addRoute(new Route("/object-to-array",
+            return RoutingConfiguration.builder().addRoute(new Route("/object-to-array",
                     Origin.of("origin-1", "http://localhost:8081/test/object-to-array"))
                             .addRequestTransformer(
                                     new RequestJsonArrayToJsonObjectBodyModifier(json -> {
@@ -55,7 +55,7 @@ class RequestJsonArrayToJsonObjectBodyModifierTest {
                             Origin.of("origin-3", "http://localhost:8081/test/array-to-empty"))
                                     .addRequestTransformer(
                                             new RequestJsonArrayToJsonObjectBodyModifier(
-                                                    json -> null)));
+                                                    json -> null))).build();
         }
     }
 

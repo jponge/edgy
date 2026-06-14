@@ -44,7 +44,7 @@ class RequestQueryParameterReplacerTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/replace-with-value",
                                             Origin.of("origin-1", "http://localhost:8081/test/replace-with-value")).addRequestTransformer(
                                     new RequestQueryParameterReplacer(QUERY_PARAM_KEY_1,
@@ -83,7 +83,7 @@ class RequestQueryParameterReplacerTest {
                                     .addRequestTransformer(new RequestQueryParameterAdder(
                                             QUERY_PARAM_KEY_1, QUERY_PARAM_VALUE_1))
                                     .addRequestTransformer(new RequestQueryParameterReplacer(
-                                            QUERY_PARAM_KEY_1, QUERY_PARAM_VALUE_2)));
+                                            QUERY_PARAM_KEY_1, QUERY_PARAM_VALUE_2))).build();
         }
     }
 

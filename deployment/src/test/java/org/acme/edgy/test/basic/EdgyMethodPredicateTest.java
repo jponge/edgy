@@ -28,9 +28,9 @@ class EdgyMethodPredicateTest {
         @Produces
         @Singleton
         RoutingConfiguration routing() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/method", Origin.of("method-post", "http://localhost:8081/test/post"))
-                            .setPredicate(new MethodPredicate(HttpMethod.POST)));
+                            .setPredicate(new MethodPredicate(HttpMethod.POST))).build();
         }
     }
 

@@ -47,8 +47,8 @@ class EdgyHttpsTlsReloadTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration().addRoute(new Route("/secure",
-                    Origin.of("origin-1", ORIGIN_URI)));
+            return RoutingConfiguration.builder().addRoute(new Route("/secure",
+                    Origin.of("origin-1", ORIGIN_URI))).build();
         }
     }
 

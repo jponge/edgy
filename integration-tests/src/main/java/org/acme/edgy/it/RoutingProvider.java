@@ -23,20 +23,20 @@ class RoutingProvider {
 
     @Produces
     RoutingConfiguration routing() {
-        return new RoutingConfigurationBuilder(new RoutingConfiguration())
+        return new RoutingConfigurationBuilder(RoutingConfiguration.builder())
                 .addRoutes(this::storkRoutes)
                 .addRoutes(this::resiliencyRoutes)
                 .build();
     }
 
-    private RoutingConfiguration storkRoutes(RoutingConfiguration routingConfiguration) {
-        return routingConfiguration
+    private RoutingConfiguration.Builder storkRoutes(RoutingConfiguration.Builder builder) {
+        return builder
                 .addRoute(new Route("/test", Origin.of("stork-origin", "stork://my-service/test/hello")))
                 .addRoute(new Route("/test-secured",
                         Origin.of("secured-stork-origin", "storks://my-secured-service/test/hello")));
     }
 
-    private RoutingConfiguration resiliencyRoutes(RoutingConfiguration routingConfiguration) {
+    private RoutingConfiguration.Builder resiliencyRoutes(RoutingConfiguration.Builder builder) {
         // Rate Limit Configuration
         int rateLimit = 10;
         long windowMillis = 1000L;
@@ -49,7 +49,7 @@ class RoutingProvider {
         int delaySeconds = 1;
         int successThreshold = 3;
 
-        return routingConfiguration
+        return builder
                 // ----------------------------- RATE LIMIT ROUTES -----------------------------
                 .addRoute(new Route("/rate-limit",
                         Origin.of("rate-limit-origin",
@@ -121,21 +121,20 @@ class RoutingProvider {
 
     // for clear structure of tested routes
     static class RoutingConfigurationBuilder {
-        private RoutingConfiguration routingConfiguration;
+        private final RoutingConfiguration.Builder builder;
 
-        RoutingConfigurationBuilder(RoutingConfiguration routingConfiguration) {
-            this.routingConfiguration = routingConfiguration;
+        RoutingConfigurationBuilder(RoutingConfiguration.Builder builder) {
+            this.builder = builder;
         }
 
         RoutingConfigurationBuilder addRoutes(
-                Function<RoutingConfiguration, RoutingConfiguration> routingConfiguration) {
-            routingConfiguration.apply(this.routingConfiguration);
+                Function<RoutingConfiguration.Builder, RoutingConfiguration.Builder> routeFunction) {
+            routeFunction.apply(this.builder);
             return this;
         }
 
         RoutingConfiguration build() {
-            return routingConfiguration;
+            return builder.build();
         }
-
     }
 }

@@ -27,9 +27,9 @@ class RequestHttpMethodModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration().addRoute(new Route("/post-to-put",
+            return RoutingConfiguration.builder().addRoute(new Route("/post-to-put",
                     Origin.of("origin-1", "http://localhost:8081/test/post-to-put"))
-                            .addRequestTransformer(new RequestHttpMethodModifier(HttpMethod.PUT)));
+                            .addRequestTransformer(new RequestHttpMethodModifier(HttpMethod.PUT))).build();
 
         }
     }

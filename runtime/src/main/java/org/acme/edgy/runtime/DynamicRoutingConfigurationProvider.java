@@ -23,6 +23,6 @@ public class DynamicRoutingConfigurationProvider {
     public RoutingConfiguration getFromConfiguration() {
         // TODO
         logger.warn("Dynamic routing configuration is not implemented yet");
-        return new RoutingConfiguration();
+        return RoutingConfiguration.builder().build();
     }
 }

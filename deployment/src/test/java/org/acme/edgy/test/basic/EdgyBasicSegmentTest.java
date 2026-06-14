@@ -30,7 +30,7 @@ class EdgyBasicSegmentTest {
         @Produces
         @Singleton
         RoutingConfiguration basicRouting() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/reverse/{a}/{b}",
                             Origin.of("origin-1", "http://localhost:8081/test/{b}/{a}")))
                     .addRoute(new Route("/three/{segment}",
@@ -52,7 +52,7 @@ class EdgyBasicSegmentTest {
                     .addRoute(new Route("/backref/{a}/{a}",
                             Origin.of("origin-10", "http://localhost:8081/test/same/{a}")))
                     .addRoute(new Route("/backref/{a}/{b}",
-                            Origin.of("origin-11", "http://localhost:8081/test/diff/{a}/{b}")));
+                            Origin.of("origin-11", "http://localhost:8081/test/diff/{a}/{b}"))).build();
         }
     }
 

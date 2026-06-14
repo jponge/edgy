@@ -32,9 +32,9 @@ class RequestHeaderRemoverTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test"))
-                            .addRequestTransformer(new RequestHeaderRemover(CUSTOM_HEADER_1)));
+                            .addRequestTransformer(new RequestHeaderRemover(CUSTOM_HEADER_1))).build();
         }
     }
 

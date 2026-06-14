@@ -36,7 +36,7 @@ class ResponseJsonObjectBodyModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration().addRoute(new Route("/remove-field",
+            return RoutingConfiguration.builder().addRoute(new Route("/remove-field",
                             Origin.of("origin-1", "http://localhost:8081/test/remove-field"))
                             .addResponseTransformer(new ResponseJsonObjectBodyModifier(json -> {
                                 json.remove("2");
@@ -71,7 +71,7 @@ class ResponseJsonObjectBodyModifierTest {
                     .addRoute(new Route("/invalid-json",
                                             Origin.of("origin-7", "http://localhost:8081/test/invalid-json"))
                                     .addResponseTransformer(
-                                            new ResponseJsonObjectBodyModifier(json -> json)));
+                                            new ResponseJsonObjectBodyModifier(json -> json))).build();
         }
     }
 

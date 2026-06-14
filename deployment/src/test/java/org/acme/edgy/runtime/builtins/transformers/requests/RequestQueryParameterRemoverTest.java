@@ -49,7 +49,7 @@ class RequestQueryParameterRemoverTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                             .addRoute(new Route("/some", Origin.of("origin-1", "http://localhost:8081/test/some"))
                         .addRequestTransformer(new RequestQueryParameterRemover(QUERY_PARAM_KEY_1, QUERY_PARAM_KEY_2)))
                             .addRoute(new Route("/all", Origin.of("origin-2", "http://localhost:8081/test/all"))
@@ -92,7 +92,7 @@ class RequestQueryParameterRemoverTest {
                                     .addRequestTransformer(new RequestQueryParameterAdder(
                                             QUERY_PARAM_KEY_1, QUERY_PARAM_VALUE_1))
                                     .addRequestTransformer(
-                                            new RequestQueryParameterRemover(QUERY_PARAM_KEY_1)));
+                                            new RequestQueryParameterRemover(QUERY_PARAM_KEY_1))).build();
         }
     }
 

@@ -51,7 +51,7 @@ class RequestQueryParameterAdderTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                             .addRoute(new Route("/values", Origin.of("origin-1", "http://localhost:8081/test/values"))
                                     .addRequestTransformer(new RequestQueryParameterAdder(
                                             QUERY_PARAM_KEY_1, QUERY_PARAM_VALUE_1))
@@ -99,7 +99,7 @@ class RequestQueryParameterAdderTest {
                                             new RequestQueryParameterAdder(QUERY_PARAM_KEY_2,
                                                     QUERY_PARAM_VALUE_3, QUERY_PARAM_VALUE_2))
                                     .addRequestTransformer(new RequestQueryParameterAdder(
-                                            QUERY_PARAM_KEY_3, QUERY_PARAM_VALUE_4)));
+                                            QUERY_PARAM_KEY_3, QUERY_PARAM_VALUE_4))).build();
         }
     }
 

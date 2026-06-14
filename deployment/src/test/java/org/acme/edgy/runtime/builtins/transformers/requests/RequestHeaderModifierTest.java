@@ -34,7 +34,7 @@ class RequestHeaderModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/modify-header",
                             Origin.of("origin-1", "http://localhost:8081/test/modify-header"))
                                     .addRequestTransformer(new RequestHeaderModifier(
@@ -42,7 +42,7 @@ class RequestHeaderModifierTest {
                     .addRoute(new Route("/no-header",
                             Origin.of("origin-2", "http://localhost:8081/test/no-header"))
                                     .addRequestTransformer(new RequestHeaderModifier(
-                                            HEADER_NAME_TO_BE_CHANGED, MODIFIED_HEADER_VALUE)));
+                                            HEADER_NAME_TO_BE_CHANGED, MODIFIED_HEADER_VALUE))).build();
         }
     }
 

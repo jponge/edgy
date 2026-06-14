@@ -82,8 +82,8 @@ class EdgyTracingTest {
         @Produces
         @Singleton
         RoutingConfiguration routing() {
-            return new RoutingConfiguration()
-                    .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test/hello")));
+            return RoutingConfiguration.builder()
+                    .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test/hello"))).build();
         }
     }
 

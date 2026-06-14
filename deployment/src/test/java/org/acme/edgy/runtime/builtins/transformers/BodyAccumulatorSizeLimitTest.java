@@ -35,7 +35,7 @@ class BodyAccumulatorSizeLimitTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/request-limit",
                             Origin.of("origin-1", "http://localhost:8081/test/echo"))
                             .addRequestTransformer(
@@ -43,7 +43,7 @@ class BodyAccumulatorSizeLimitTest {
                     .addRoute(new Route("/response-limit",
                             Origin.of("origin-2", "http://localhost:8081/test/large-response"))
                             .addResponseTransformer(
-                                    new ResponseJsonObjectBodyModifier(UnaryOperator.identity())));
+                                    new ResponseJsonObjectBodyModifier(UnaryOperator.identity()))).build();
         }
     }
 

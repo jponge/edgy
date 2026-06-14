@@ -37,7 +37,7 @@ class RequestJsonObjectBodyModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration().addRoute(new Route("/remove-field",
+            return RoutingConfiguration.builder().addRoute(new Route("/remove-field",
                     Origin.of("origin-1", "http://localhost:8081/test/remove-field"))
                             .addRequestTransformer(new RequestJsonObjectBodyModifier(json -> {
                                 json.remove("2");
@@ -68,7 +68,7 @@ class RequestJsonObjectBodyModifierTest {
                             Origin.of("origin-6", "http://localhost:8081/test/replace-full"))
                                     .addRequestTransformer(new RequestJsonObjectBodyModifier(
                                             new JsonObject().put("replaced", "yes").put("arr",
-                                                    new JsonArray().add(1).add(2)))));
+                                                    new JsonArray().add(1).add(2))))).build();
         }
     }
 

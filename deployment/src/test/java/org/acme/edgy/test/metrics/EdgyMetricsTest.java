@@ -107,11 +107,11 @@ class EdgyMetricsTest {
         @Produces
         @Singleton
         RoutingConfiguration routing() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route(HELLO_ROUTE_PATH,
                             Origin.of(HELLO_ORIGIN_ID, "http://localhost:8081/test/hello")))
                     .addRoute(new Route(UNREACHABLE_ROUTE_PATH,
-                            Origin.of(UNREACHABLE_ORIGIN_ID, "http://localhost:1/nowhere")));
+                            Origin.of(UNREACHABLE_ORIGIN_ID, "http://localhost:1/nowhere"))).build();
         }
     }
 

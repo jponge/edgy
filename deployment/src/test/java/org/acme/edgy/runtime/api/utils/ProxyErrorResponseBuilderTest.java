@@ -72,7 +72,7 @@ class ProxyErrorResponseBuilderTest {
                 }
             };
 
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/request-transformer",
                             Origin.of("origin-1", "origin uri is never called"))
                             .addRequestTransformer(requestTransformerInvokingBadRequest) // new response
@@ -81,7 +81,7 @@ class ProxyErrorResponseBuilderTest {
                     .addRoute(new Route("/response-transformer",
                             Origin.of("origin-2", "http://localhost:8081/test/response-transformer"))
                             .addResponseTransformer(responseTransformerInvokingBadRequest) // new response
-                            .addResponseTransformer(responseTransfomerAddsHeader)); // is reached
+                            .addResponseTransformer(responseTransfomerAddsHeader)).build(); // is reached
 
         }
     }

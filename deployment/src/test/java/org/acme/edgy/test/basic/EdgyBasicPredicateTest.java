@@ -26,13 +26,13 @@ class EdgyBasicPredicateTest {
         @Produces
         @Singleton
         RoutingConfiguration predicatesRouting() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test/hello"))
                             .setPredicate(
                                     rc -> "baz".equals(rc.request().getHeader(
                                             "X-FOO-BAR"))))
                     .addRoute(new Route("/hello", Origin.of("origin-2", "http://localhost:8081/test/hello"))
-                            .setPredicate(rc -> true && rc.request().getHeader("X-YOLO") != null));
+                            .setPredicate(rc -> true && rc.request().getHeader("X-YOLO") != null)).build();
         }
     }
 

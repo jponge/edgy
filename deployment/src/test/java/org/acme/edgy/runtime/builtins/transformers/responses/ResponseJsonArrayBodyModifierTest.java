@@ -35,7 +35,7 @@ class ResponseJsonArrayBodyModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration().addRoute(new Route("/remove-element",
+            return RoutingConfiguration.builder().addRoute(new Route("/remove-element",
                     Origin.of("origin-1", "http://localhost:8081/test/remove-element"))
                             .addResponseTransformer(new ResponseJsonArrayBodyModifier(json -> {
                                 json.remove(1); // Remove "Ipsum"
@@ -69,7 +69,7 @@ class ResponseJsonArrayBodyModifierTest {
                     .addRoute(new Route("/invalid-json",
                             Origin.of("origin-7", "http://localhost:8081/test/invalid-json"))
                                     .addResponseTransformer(
-                                            new ResponseJsonArrayBodyModifier(json -> json)));
+                                            new ResponseJsonArrayBodyModifier(json -> json))).build();
         }
     }
 

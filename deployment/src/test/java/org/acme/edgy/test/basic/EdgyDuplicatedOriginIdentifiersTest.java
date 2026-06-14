@@ -21,10 +21,10 @@ class EdgyDuplicatedOriginIdentifiersTest {
         @Produces
         @Singleton
         RoutingConfiguration basicRouting() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(
                             new Route("/hello", Origin.of("duplicated-origin-id", "http://localhost:8081/test/hello")))
-                    .addRoute(new Route("/hi", Origin.of("duplicated-origin-id", "http://localhost:8081/test/hi")));
+                    .addRoute(new Route("/hi", Origin.of("duplicated-origin-id", "http://localhost:8081/test/hi"))).build();
         }
     }
 

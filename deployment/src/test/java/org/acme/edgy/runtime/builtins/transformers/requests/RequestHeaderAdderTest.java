@@ -32,11 +32,11 @@ class RequestHeaderAdderTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test"))
                             .addRequestTransformer(new RequestHeaderAdder(CUSTOM_HEADER_1, CUSTOM_HEADER_VALUE_1))
                             .addRequestTransformer(new RequestHeaderAdder(CUSTOM_HEADER_2, CUSTOM_HEADER_VALUE_2))
-                    );
+                    ).build();
         }
     }
 

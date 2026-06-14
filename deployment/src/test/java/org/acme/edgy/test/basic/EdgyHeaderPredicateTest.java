@@ -29,11 +29,11 @@ class EdgyHeaderPredicateTest {
         @Produces
         @Singleton
         RoutingConfiguration routing() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/header-exact", Origin.of("header-exact", "http://localhost:8081/test/hello"))
                             .setPredicate(new HeaderPredicate("X-Api-Version", "v2")))
                     .addRoute(new Route("/header-regex", Origin.of("header-regex", "http://localhost:8081/test/hello"))
-                            .setPredicate(new HeaderPredicate("X-Request-Id", Pattern.compile("\\d+"))));
+                            .setPredicate(new HeaderPredicate("X-Request-Id", Pattern.compile("\\d+")))).build();
         }
     }
 

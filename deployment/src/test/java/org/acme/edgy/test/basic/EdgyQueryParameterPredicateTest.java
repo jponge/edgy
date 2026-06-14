@@ -29,13 +29,13 @@ class EdgyQueryParameterPredicateTest {
         @Produces
         @Singleton
         RoutingConfiguration routing() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/query-exists", Origin.of("query-exists", "http://localhost:8081/test/hello"))
                             .setPredicate(new QueryParameterPredicate("debug")))
                     .addRoute(new Route("/query-exact", Origin.of("query-exact", "http://localhost:8081/test/hello"))
                             .setPredicate(new QueryParameterPredicate("version", "2")))
                     .addRoute(new Route("/query-regex", Origin.of("query-regex", "http://localhost:8081/test/hello"))
-                            .setPredicate(new QueryParameterPredicate("token", Pattern.compile("[a-f0-9]{8}"))));
+                            .setPredicate(new QueryParameterPredicate("token", Pattern.compile("[a-f0-9]{8}")))).build();
         }
     }
 

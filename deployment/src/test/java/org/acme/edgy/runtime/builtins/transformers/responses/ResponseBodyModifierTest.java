@@ -35,14 +35,14 @@ class ResponseBodyModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/modify-body",
                             Origin.of("origin-1", "http://localhost:8081/test/modify-body"))
                                     .addResponseTransformer(new ResponseBodyModifier(
                                             Body.body(Buffer.buffer(MODIFIED_BODY)))))
                     .addRoute(new Route("/modify-null",
                             Origin.of("origin-2", "http://localhost:8081/test/modify-null"))
-                                    .addResponseTransformer(new ResponseBodyModifier((Body) null)));
+                                    .addResponseTransformer(new ResponseBodyModifier((Body) null))).build();
         }
     }
 

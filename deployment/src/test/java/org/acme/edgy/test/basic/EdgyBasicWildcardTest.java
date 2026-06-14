@@ -28,7 +28,7 @@ class EdgyBasicWildcardTest {
         @Produces
         @Singleton
         RoutingConfiguration basicRouting() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/v1/*",
                             Origin.of("origin-1", "http://localhost:8081/test/dump/{requestURI}")))
                     .addRoute(new Route("/v2/*",
@@ -37,7 +37,7 @@ class EdgyBasicWildcardTest {
                     .addRoute(new Route("/v3/*",
                             Origin.of("origin-3", "http://localhost:8081/test/dump")))
                     .addRoute(new Route("/api/{version}/*",
-                            Origin.of("origin-4", "http://localhost:8081/test/dump/{version}/{suffix}")));
+                            Origin.of("origin-4", "http://localhost:8081/test/dump/{version}/{suffix}"))).build();
         }
     }
 

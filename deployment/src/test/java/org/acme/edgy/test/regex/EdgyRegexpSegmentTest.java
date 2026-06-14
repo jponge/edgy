@@ -29,7 +29,7 @@ class EdgyRegExpSegmentTest {
         @Produces
         @Singleton
         RoutingConfiguration routing() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/regexp/(?<userId>[0-9]+)/(?<action>[a-z]+)",
                             Origin.of("origin-1", "http://localhost:8081/test/{action}/{userId}"), REGEXP))
                     .addRoute(new Route("/echo/(?<word>[a-z]+)",
@@ -37,7 +37,7 @@ class EdgyRegExpSegmentTest {
                     .addRoute(new Route("/span/(?<middle>.*)/end",
                             Origin.of("origin-3", "http://localhost:8081/test/{middle}"), REGEXP))
                     .addRoute(new Route("/back/(?<x>[^/]+)/\\k<x>",
-                            Origin.of("origin-4", "http://localhost:8081/test/{x}"), REGEXP));
+                            Origin.of("origin-4", "http://localhost:8081/test/{x}"), REGEXP)).build();
         }
     }
 

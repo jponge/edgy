@@ -35,7 +35,7 @@ class RequestJsonArrayBodyModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration().addRoute(new Route("/remove-element",
+            return RoutingConfiguration.builder().addRoute(new Route("/remove-element",
                     Origin.of("origin-1", "http://localhost:8081/test/remove-element"))
                             .addRequestTransformer(new RequestJsonArrayBodyModifier(json -> {
                                 json.remove(1); // Remove "Ipsum"
@@ -65,7 +65,7 @@ class RequestJsonArrayBodyModifierTest {
                     .addRoute(new Route(
                             "/replace-full", Origin.of("origin-6", "http://localhost:8081/test/replace-full")).addRequestTransformer(
                                     new RequestJsonArrayBodyModifier(new JsonArray().add(1).add(2)
-                                            .add(new JsonObject().put("key", "value")))));
+                                            .add(new JsonObject().put("key", "value"))))).build();
         }
     }
 

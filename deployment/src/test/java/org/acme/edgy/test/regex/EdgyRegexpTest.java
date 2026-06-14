@@ -27,7 +27,7 @@ class EdgyRegExpTest {
         @Produces
         @Singleton
         RoutingConfiguration routing() {
-            return new RoutingConfiguration()
+            return RoutingConfiguration.builder()
                     .addRoute(new Route("/[a-c]+/.*", Origin.of("origin-1", "http://localhost:8081/test"),
                             REGEXP))
                     .addRoute(new Route("/user/[0-9]+/profile",
@@ -37,7 +37,7 @@ class EdgyRegExpTest {
                     .addRoute(new Route("/complex/([a-z]+)-(\\d{2,4})/item/(foo|bar)",
                             Origin.of("origin-4", "http://localhost:8081/test"), REGEXP))
                     .addRoute(new Route("/multi/.*/end",
-                            Origin.of("origin-5", "http://localhost:8081/test"), REGEXP));
+                            Origin.of("origin-5", "http://localhost:8081/test"), REGEXP)).build();
         }
     }
 

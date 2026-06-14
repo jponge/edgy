@@ -34,7 +34,7 @@ class ResponseJsonArrayToJsonObjectBodyModifierTest {
         @Produces
         @Singleton
         RoutingConfiguration routingConfiguration() {
-            return new RoutingConfiguration().addRoute(new Route("/array-to-object",
+            return RoutingConfiguration.builder().addRoute(new Route("/array-to-object",
                     Origin.of("origin-1", "http://localhost:8081/test/array-to-object"))
                             .addResponseTransformer(
                                     new ResponseJsonArrayToJsonObjectBodyModifier(json -> {
@@ -64,7 +64,7 @@ class ResponseJsonArrayToJsonObjectBodyModifierTest {
                                                 JsonObject obj = new JsonObject();
                                                 obj.put("data", json);
                                                 return obj;
-                                            })));
+                                            }))).build();
         }
     }
 
