@@ -38,12 +38,26 @@ public interface EdgyConfig {
      */
     TracingConfig tracing();
 
+    /**
+     * Logging configuration.
+     */
+    LoggingConfig logging();
+
     interface TracingConfig {
 
         /**
          * Whether to enable tracing.
          */
         Optional<Boolean> enabled();
+    }
+
+    interface LoggingConfig {
+
+        /**
+         * Whether to enable logging.
+         */
+        @WithDefault("false")
+        boolean enabled();
     }
 
 }

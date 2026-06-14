@@ -7,6 +7,7 @@ import org.acme.edgy.runtime.DynamicRoutingConfigurationProvider;
 import org.acme.edgy.runtime.OriginHttpClientManager;
 import org.acme.edgy.runtime.RouterConfigurator;
 import org.acme.edgy.runtime.config.EdgyConfig;
+import org.acme.edgy.runtime.logging.LoggingProxyObserver;
 import org.acme.edgy.runtime.tracing.OTelTracingProxyObserver;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.jboss.logging.Logger;
@@ -70,5 +71,14 @@ class EdgyProcessor {
         }
 
         additionalBeans.produce(new AdditionalBeanBuildItem(OTelTracingProxyObserver.class));
+    }
+
+    @BuildStep
+    void setupLoggingObserver(EdgyConfig config,
+            BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
+        if (!config.logging().enabled()) {
+            return;
+        }
+        additionalBeans.produce(new AdditionalBeanBuildItem(LoggingProxyObserver.class));
     }
 }
