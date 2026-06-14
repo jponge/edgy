@@ -29,10 +29,6 @@
             <artifactId>quarkus-smallrye-fault-tolerance-deployment</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-tls-registry-deployment</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.acme</groupId>
             <artifactId>edgy</artifactId>
             <version>${project.version}</version>
