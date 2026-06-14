@@ -43,6 +43,11 @@ public interface EdgyConfig {
      */
     LoggingConfig logging();
 
+    /**
+     * Metrics configuration.
+     */
+    MetricsConfig metrics();
+
     interface TracingConfig {
 
         /**
@@ -58,6 +63,14 @@ public interface EdgyConfig {
          */
         @WithDefault("false")
         boolean enabled();
+    }
+
+    interface MetricsConfig {
+
+        /**
+         * Whether to enable metrics.
+         */
+        Optional<Boolean> enabled();
     }
 
 }

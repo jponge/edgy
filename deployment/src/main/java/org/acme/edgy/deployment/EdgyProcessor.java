@@ -8,6 +8,7 @@ import org.acme.edgy.runtime.OriginHttpClientManager;
 import org.acme.edgy.runtime.RouterConfigurator;
 import org.acme.edgy.runtime.config.EdgyConfig;
 import org.acme.edgy.runtime.logging.LoggingProxyObserver;
+import org.acme.edgy.runtime.metrics.MicrometerMetricsProxyObserver;
 import org.acme.edgy.runtime.tracing.OTelTracingProxyObserver;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.jboss.logging.Logger;
@@ -71,6 +72,17 @@ class EdgyProcessor {
         }
 
         additionalBeans.produce(new AdditionalBeanBuildItem(OTelTracingProxyObserver.class));
+    }
+
+    @BuildStep
+    void setupMetricsObserver(EdgyConfig config, Capabilities capabilities,
+            BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
+        boolean metricsPresent = capabilities.isPresent(Capability.METRICS);
+        boolean enabled = config.metrics().enabled().orElse(metricsPresent);
+        if (!enabled || !metricsPresent) {
+            return;
+        }
+        additionalBeans.produce(new AdditionalBeanBuildItem(MicrometerMetricsProxyObserver.class));
     }
 
     @BuildStep
