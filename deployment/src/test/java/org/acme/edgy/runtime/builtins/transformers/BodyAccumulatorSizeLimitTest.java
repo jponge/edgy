@@ -7,11 +7,11 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.function.UnaryOperator;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -31,9 +31,9 @@ class BodyAccumulatorSizeLimitTest {
 
     private static final int MAX_BODY_SIZE = 16;
 
-    @ApplicationScoped
     static class RoutingProvider {
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/request-limit",

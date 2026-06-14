@@ -2,10 +2,10 @@ package org.acme.edgy.runtime.builtins.transformers.requests;
 
 import static org.acme.edgy.runtime.api.utils.StatusCode.OK;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -27,10 +27,10 @@ class RequestHeaderRemoverTest {
     private static final String CUSTOM_HEADER_VALUE_1 = "Yolo";
     private static final String CUSTOM_HEADER_VALUE_2 = "abc";
 
-    @ApplicationScoped
     static class RoutingProvider {
 
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test"))

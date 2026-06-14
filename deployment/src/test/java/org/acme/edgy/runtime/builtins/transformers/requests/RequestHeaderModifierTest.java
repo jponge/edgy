@@ -4,12 +4,12 @@ import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
 import static org.acme.edgy.runtime.api.utils.StatusCode.INTERNAL_SERVER_ERROR;
 import static org.acme.edgy.runtime.api.utils.StatusCode.OK;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.Path;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -30,9 +30,9 @@ class RequestHeaderModifierTest {
     private static final String ORIGINAL_HEADER_VALUE = "original";
     private static final String MODIFIED_HEADER_VALUE = "changed";
 
-    @ApplicationScoped
     static class RoutingProvider {
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/modify-header",

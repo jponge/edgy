@@ -9,6 +9,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -27,6 +28,7 @@ class EdgyBasicSegmentTest {
     static class RoutingProvider {
 
         @Produces
+        @Singleton
         RoutingConfiguration basicRouting() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/reverse/{a}/{b}",

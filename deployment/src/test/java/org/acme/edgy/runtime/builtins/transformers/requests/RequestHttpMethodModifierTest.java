@@ -2,10 +2,10 @@ package org.acme.edgy.runtime.builtins.transformers.requests;
 
 import static org.acme.edgy.runtime.api.utils.StatusCode.OK;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -22,10 +22,10 @@ import io.vertx.core.http.HttpMethod;
 
 class RequestHttpMethodModifierTest {
 
-    @ApplicationScoped
     static class RoutingProvider {
 
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/post-to-put",
                     Origin.of("origin-1", "http://localhost:8081/test/post-to-put"))

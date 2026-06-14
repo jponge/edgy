@@ -69,6 +69,7 @@ class EdgyTracingDisabledTest {
     static class RoutingProvider {
 
         @Produces
+        @Singleton
         RoutingConfiguration routing() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test/hello")));

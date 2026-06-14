@@ -9,10 +9,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -32,9 +32,9 @@ class ResponseJsonObjectBodyModifierTest {
     private static final String ORIGINAL_JSON =
             "{\"1\":\"Lorem\",\"2\":\"Ipsum\",\"3\":[\"Dolor\",\"Sit\",\"Amet\"]}";
 
-    @ApplicationScoped
     static class RoutingProvider {
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/remove-field",
                             Origin.of("origin-1", "http://localhost:8081/test/remove-field"))

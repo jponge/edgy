@@ -9,6 +9,7 @@ import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -26,6 +27,7 @@ class EdgyRegExpSegmentTest {
     static class RoutingProvider {
 
         @Produces
+        @Singleton
         RoutingConfiguration routing() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/regexp/(?<userId>[0-9]+)/(?<action>[a-z]+)",

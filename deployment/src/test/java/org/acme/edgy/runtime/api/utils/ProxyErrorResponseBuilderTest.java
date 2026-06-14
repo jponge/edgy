@@ -7,6 +7,7 @@ import static org.hamcrest.CoreMatchers.is;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.RequestTransformer;
@@ -31,6 +32,7 @@ class ProxyErrorResponseBuilderTest {
     static class RoutingProvider {
 
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
 
             RequestTransformer requestAssertFailure = new RequestTransformer() {

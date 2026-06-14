@@ -13,6 +13,7 @@ import java.util.UUID;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -44,6 +45,7 @@ class EdgyHttpsTlsReloadTest {
 
     static class RoutingProvider {
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/secure",
                     Origin.of("origin-1", ORIGIN_URI)));

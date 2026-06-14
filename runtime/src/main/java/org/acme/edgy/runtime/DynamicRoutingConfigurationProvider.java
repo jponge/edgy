@@ -1,23 +1,25 @@
 package org.acme.edgy.runtime;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.RoutingConfiguration;
 import org.acme.edgy.runtime.config.EdgyRoutes;
 import org.jboss.logging.Logger;
 
-@ApplicationScoped
+@Singleton
 public class DynamicRoutingConfigurationProvider {
 
-    @Inject
-    EdgyRoutes routes;
+    private final EdgyRoutes routes;
+    private final Logger logger;
 
-    @Inject
-    Logger logger;
+    DynamicRoutingConfigurationProvider(EdgyRoutes routes, Logger logger) {
+        this.routes = routes;
+        this.logger = logger;
+    }
 
     @Produces
+    @Singleton
     public RoutingConfiguration getFromConfiguration() {
         // TODO
         logger.warn("Dynamic routing configuration is not implemented yet");

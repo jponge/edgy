@@ -9,13 +9,13 @@ import static org.acme.edgy.runtime.builtins.transformers.assertions.QueryParamA
 import java.util.List;
 import java.util.Map;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.UriInfo;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -47,9 +47,9 @@ class RequestQueryParameterAdderTest {
     static record SomeClass(String value) {
     }
 
-    @ApplicationScoped
     static class RoutingProvider {
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration()
                             .addRoute(new Route("/values", Origin.of("origin-1", "http://localhost:8081/test/values"))

@@ -8,6 +8,7 @@ import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.UriInfo;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -25,6 +26,7 @@ class EdgyBasicWildcardTest {
     static class RoutingProvider {
 
         @Produces
+        @Singleton
         RoutingConfiguration basicRouting() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/v1/*",

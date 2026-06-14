@@ -3,6 +3,7 @@ package org.acme.edgy.ssl;
 import static org.acme.edgy.runtime.api.utils.StatusCode.BAD_GATEWAY;
 
 import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -36,6 +37,7 @@ class EdgyHttpsServerAuthenticationBadKeystoreTest {
 
     static class RoutingProvider {
         @Produces
+        @Singleton
         RoutingConfiguration routingConfiguration() {
             return new RoutingConfiguration().addRoute(new Route("/secure",
                     Origin.of("origin-1", ORIGIN_URI)));

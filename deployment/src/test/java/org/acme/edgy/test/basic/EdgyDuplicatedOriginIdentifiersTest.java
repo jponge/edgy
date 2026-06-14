@@ -3,6 +3,7 @@ package org.acme.edgy.test.basic;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -18,6 +19,7 @@ class EdgyDuplicatedOriginIdentifiersTest {
 
     static class RoutingProvider {
         @Produces
+        @Singleton
         RoutingConfiguration basicRouting() {
             return new RoutingConfiguration()
                     .addRoute(

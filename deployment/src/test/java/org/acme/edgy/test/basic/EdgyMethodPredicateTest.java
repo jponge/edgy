@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import jakarta.enterprise.inject.Produces;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
@@ -25,6 +26,7 @@ class EdgyMethodPredicateTest {
     static class RoutingProvider {
 
         @Produces
+        @Singleton
         RoutingConfiguration routing() {
             return new RoutingConfiguration()
                     .addRoute(new Route("/method", Origin.of("method-post", "http://localhost:8081/test/post"))
