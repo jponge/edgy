@@ -14,7 +14,13 @@ public class CertificateUpdateEventListener {
 
     private static final Logger logger = Logger.getLogger(CertificateUpdateEventListener.class);
 
-    void onCertificateUpdate(@Observes CertificateUpdatedEvent event, OriginHttpClientManager originHttpClientManager) {
+    private final OriginHttpClientManager originHttpClientManager;
+
+    CertificateUpdateEventListener(OriginHttpClientManager originHttpClientManager) {
+        this.originHttpClientManager = originHttpClientManager;
+    }
+
+    void onCertificateUpdate(@Observes CertificateUpdatedEvent event) {
         String updatedTlsConfigurationName = event.name();
         TlsConfiguration updatedTlsConfiguration = event.tlsConfiguration();
         for (HttpClient httpClientToBeChanged : originHttpClientManager

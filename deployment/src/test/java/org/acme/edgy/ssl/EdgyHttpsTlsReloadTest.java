@@ -24,7 +24,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 import io.quarkus.tls.CertificateUpdatedEvent;
 import io.quarkus.tls.TlsConfiguration;
 import io.quarkus.tls.TlsConfigurationRegistry;
@@ -53,11 +53,11 @@ class EdgyHttpsTlsReloadTest {
     }
 
     @RegisterExtension
-    static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+    private static final QuarkusExtensionTest extensionTest = new QuarkusExtensionTest()
             .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
                     .addClasses(HttpsServer.class, RoutingProvider.class))
             .overrideRuntimeConfigKey("loc", temp.getAbsolutePath())
-            .overrideRuntimeConfigKey("edgy.origin.origin-1.tls-configuration-name",
+            .overrideConfigKey("edgy.origin.origin-1.tls-configuration-name",
                     TLS_BUCKET_NAME)
             .overrideRuntimeConfigKey("quarkus.tls." + TLS_BUCKET_NAME + ".key-store.p12.path",
                     temp.getAbsolutePath() + "/tls.p12")

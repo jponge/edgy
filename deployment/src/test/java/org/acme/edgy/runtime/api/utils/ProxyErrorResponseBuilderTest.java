@@ -5,9 +5,9 @@ import static org.acme.edgy.runtime.api.utils.StatusCode.BAD_REQUEST;
 import static org.hamcrest.CoreMatchers.is;
 
 import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.RequestTransformer;
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 import io.restassured.RestAssured;
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
@@ -96,7 +96,7 @@ class ProxyErrorResponseBuilderTest {
     }
 
     @RegisterExtension
-    static final QuarkusUnitTest unitTest = new QuarkusUnitTest().setArchiveProducer(
+    private static final QuarkusExtensionTest extensionTest = new QuarkusExtensionTest().setArchiveProducer(
             () -> ShrinkWrap.create(JavaArchive.class).addClasses(RoutingProvider.class));
 
     private static final String HEADER = "x-added-in-response-transformer";

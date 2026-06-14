@@ -10,7 +10,7 @@ class EdgyDevModeTest {
 
     // Start hot reload (DevMode) test with your extension loaded
     @RegisterExtension
-    static final QuarkusDevModeTest devModeTest = new QuarkusDevModeTest()
+    private static final QuarkusDevModeTest devModeTest = new QuarkusDevModeTest()
             .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
 //    @Test
