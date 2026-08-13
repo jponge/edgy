@@ -45,6 +45,8 @@ public class ScatterHandler implements io.vertx.core.Handler<RoutingContext> {
             return;
         }
 
+        enrichSpanWithScatterAttributes();
+
         HttpServerRequest request = rc.request();
         Buffer bodyAccumulator = Buffer.buffer();
         request.handler(bodyAccumulator::appendBuffer);
@@ -109,6 +111,19 @@ public class ScatterHandler implements io.vertx.core.Handler<RoutingContext> {
                 }
                 return results;
             });
+        }
+    }
+
+    private void enrichSpanWithScatterAttributes() {
+        try {
+            io.opentelemetry.api.trace.Span span = io.opentelemetry.api.trace.Span.current();
+            if (span.isRecording()) {
+                span.setAttribute(
+                        io.opentelemetry.api.common.AttributeKey.stringKey("edgy.scatter.route"),
+                        scatterRoute.path());
+            }
+        } catch (LinkageError ignored) {
+            // OpenTelemetry API not on classpath
         }
     }
 }
