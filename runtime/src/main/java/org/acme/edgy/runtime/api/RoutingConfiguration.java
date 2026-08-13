@@ -6,9 +6,11 @@ import java.util.List;
 public class RoutingConfiguration {
 
     private final List<Route> routes;
+    private final List<ScatterRoute> scatterRoutes;
 
-    private RoutingConfiguration(List<Route> routes) {
+    private RoutingConfiguration(List<Route> routes, List<ScatterRoute> scatterRoutes) {
         this.routes = List.copyOf(routes);
+        this.scatterRoutes = List.copyOf(scatterRoutes);
     }
 
     public static Builder builder() {
@@ -19,9 +21,14 @@ public class RoutingConfiguration {
         return routes;
     }
 
+    public List<ScatterRoute> scatterRoutes() {
+        return scatterRoutes;
+    }
+
     public static class Builder {
 
         private final List<Route> routes = new ArrayList<>();
+        private final List<ScatterRoute> scatterRoutes = new ArrayList<>();
 
         private Builder() {
         }
@@ -31,8 +38,16 @@ public class RoutingConfiguration {
             return this;
         }
 
+        public Builder addScatterRoute(ScatterRoute scatterRoute) {
+            scatterRoutes.add(scatterRoute);
+            return this;
+        }
+
         public RoutingConfiguration build() {
-            return new RoutingConfiguration(routes);
+            for (ScatterRoute scatterRoute : scatterRoutes) {
+                scatterRoute.validate();
+            }
+            return new RoutingConfiguration(routes, scatterRoutes);
         }
     }
 }
