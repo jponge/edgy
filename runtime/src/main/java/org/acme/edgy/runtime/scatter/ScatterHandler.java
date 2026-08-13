@@ -23,6 +23,7 @@ import io.vertx.httpproxy.ProxyRequest;
 public class ScatterHandler implements io.vertx.core.Handler<RoutingContext> {
 
     private static final Logger logger = Logger.getLogger(ScatterHandler.class);
+    private static volatile Boolean otelAvailable;
 
     private final ScatterRoute scatterRoute;
     private final List<LegDefinition> legDefinitions;
@@ -71,7 +72,7 @@ public class ScatterHandler implements io.vertx.core.Handler<RoutingContext> {
 
         for (LegDefinition legDef : legDefinitions) {
             Body body = bufferedBody != null && bufferedBody.length() > 0
-                    ? Body.body(bufferedBody)
+                    ? Body.body(bufferedBody.copy())
                     : null;
 
             ScatterLegRequest legRequest = new ScatterLegRequest(originalRequest);
@@ -115,6 +116,17 @@ public class ScatterHandler implements io.vertx.core.Handler<RoutingContext> {
     }
 
     private void enrichSpanWithScatterAttributes() {
+        if (otelAvailable == null) {
+            try {
+                Class.forName("io.opentelemetry.api.trace.Span");
+                otelAvailable = true;
+            } catch (ClassNotFoundException e) {
+                otelAvailable = false;
+            }
+        }
+        if (!otelAvailable) {
+            return;
+        }
         try {
             io.opentelemetry.api.trace.Span span = io.opentelemetry.api.trace.Span.current();
             if (span.isRecording()) {
@@ -123,7 +135,7 @@ public class ScatterHandler implements io.vertx.core.Handler<RoutingContext> {
                         scatterRoute.path());
             }
         } catch (LinkageError ignored) {
-            // OpenTelemetry API not on classpath
+            // OpenTelemetry API not on classpath (safety net)
         }
     }
 }

@@ -86,7 +86,6 @@ public class RouterConfigurator {
 
     private void configureScatterRoutes(Router router) {
         for (ScatterRoute scatterRoute : routingConfiguration.scatterRoutes()) {
-            scatterRoute.validate();
             List<ScatterHandler.LegDefinition> legDefinitions = new ArrayList<>();
 
             for (Leg leg : scatterRoute.legs()) {

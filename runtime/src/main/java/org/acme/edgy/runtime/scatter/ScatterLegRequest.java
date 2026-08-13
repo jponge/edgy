@@ -321,6 +321,9 @@ class ScatterLegRequest extends HttpServerRequestInternal {
 
         @Override
         public void write(String chunk, String enc, Handler handler) {
+            if (handler != null) {
+                handler.handle(Future.succeededFuture());
+            }
         }
 
         @Override
@@ -330,6 +333,9 @@ class ScatterLegRequest extends HttpServerRequestInternal {
 
         @Override
         public void write(String chunk, Handler handler) {
+            if (handler != null) {
+                handler.handle(Future.succeededFuture());
+            }
         }
 
         @Override
@@ -351,6 +357,9 @@ class ScatterLegRequest extends HttpServerRequestInternal {
 
         @Override
         public void end(String chunk, Handler handler) {
+            if (handler != null) {
+                handler.handle(Future.succeededFuture());
+            }
         }
 
         @Override
@@ -360,6 +369,9 @@ class ScatterLegRequest extends HttpServerRequestInternal {
 
         @Override
         public void end(String chunk, String enc, Handler handler) {
+            if (handler != null) {
+                handler.handle(Future.succeededFuture());
+            }
         }
 
         @Override
@@ -369,6 +381,9 @@ class ScatterLegRequest extends HttpServerRequestInternal {
 
         @Override
         public void end(Buffer chunk, Handler handler) {
+            if (handler != null) {
+                handler.handle(Future.succeededFuture());
+            }
         }
 
         @Override
@@ -493,6 +508,9 @@ class ScatterLegRequest extends HttpServerRequestInternal {
 
         @Override
         public void writeEarlyHints(MultiMap headers, Handler handler) {
+            if (handler != null) {
+                handler.handle(Future.succeededFuture());
+            }
         }
 
         @Override

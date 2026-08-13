@@ -2,7 +2,6 @@ package org.acme.edgy.runtime.api;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.acme.edgy.runtime.api.utils.SegmentUtils;
@@ -13,7 +12,6 @@ public class ScatterRoute {
     private final String path;
     private final PathMode pathMode;
 
-    private final CompiledPath transformedPath;
     private final boolean regexRoute;
     private final String resolvedPath;
 
@@ -31,15 +29,13 @@ public class ScatterRoute {
         this.pathMode = pathMode;
 
         if (pathMode == PathMode.BASIC && SegmentUtils.needsRegexRouting(path)) {
-            this.transformedPath = SegmentUtils.transform(path);
+            CompiledPath compiled = SegmentUtils.transform(path);
             this.regexRoute = true;
-            this.resolvedPath = transformedPath.compiledPattern().pattern();
+            this.resolvedPath = compiled.compiledPattern().pattern();
         } else if (pathMode == PathMode.REGEXP) {
-            this.transformedPath = SegmentUtils.fromRegexp(path);
             this.regexRoute = true;
             this.resolvedPath = path;
         } else {
-            this.transformedPath = null;
             this.regexRoute = false;
             this.resolvedPath = path;
         }
@@ -59,14 +55,6 @@ public class ScatterRoute {
 
     public boolean needsRegexRouting() {
         return regexRoute;
-    }
-
-    public boolean hasWildcard() {
-        return path.endsWith("/*");
-    }
-
-    public Map<String, String> extractPathVariables(String requestUri) {
-        return SegmentUtils.extractPathVariables(transformedPath, requestUri);
     }
 
     public RoutingPredicate predicate() {
