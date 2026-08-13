@@ -1,18 +1,23 @@
 package org.acme.edgy.runtime;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.event.Observes;
 
+import org.acme.edgy.runtime.api.Leg;
 import org.acme.edgy.runtime.api.ProxyObserver;
 import org.acme.edgy.runtime.api.RequestTransformer;
 import org.acme.edgy.runtime.api.ResponseTransformer;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
+import org.acme.edgy.runtime.api.ScatterRoute;
 import org.acme.edgy.runtime.interceptors.ObservingProxyInterceptor;
 import org.acme.edgy.runtime.interceptors.QueryParamPropagationInterceptor;
 import org.acme.edgy.runtime.interceptors.UriTemplateInterceptor;
+import org.acme.edgy.runtime.interceptors.scatter.MethodBodyInterceptor;
+import org.acme.edgy.runtime.scatter.ScatterHandler;
 
 import io.quarkus.arc.All;
 import io.vertx.core.Future;
@@ -74,6 +79,54 @@ public class RouterConfigurator {
 
             route.guardInterceptor().ifPresent(proxy::addInterceptor);
             registerVertxRoute(router, route, proxy);
+        }
+
+        configureScatterRoutes(router);
+    }
+
+    private void configureScatterRoutes(Router router) {
+        for (ScatterRoute scatterRoute : routingConfiguration.scatterRoutes()) {
+            scatterRoute.validate();
+            List<ScatterHandler.LegDefinition> legDefinitions = new ArrayList<>();
+
+            for (Leg leg : scatterRoute.legs()) {
+                HttpClient httpClient = originHttpClientManager.getOrCreateHttpClient(leg.origin());
+                Route syntheticRoute = new Route(scatterRoute.path(), leg.origin(), scatterRoute.pathMode());
+
+                List<ProxyInterceptor> interceptors = new ArrayList<>();
+                interceptors.add(new MethodBodyInterceptor(leg));
+                if (!observers.isEmpty()) {
+                    interceptors.add(new ObservingProxyInterceptor(observers, syntheticRoute));
+                }
+                interceptors.add(new UriTemplateInterceptor(syntheticRoute));
+                interceptors.add(new QueryParamPropagationInterceptor());
+
+                for (ResponseTransformer transformer : leg.responseTransformers()) {
+                    interceptors.add(new ProxyInterceptor() {
+                        @Override
+                        public Future<Void> handleProxyResponse(ProxyContext context) {
+                            return transformer.apply(context);
+                        }
+                    });
+                }
+                for (RequestTransformer transformer : leg.requestTransformers()) {
+                    interceptors.add(new ProxyInterceptor() {
+                        @Override
+                        public Future<ProxyResponse> handleProxyRequest(ProxyContext context) {
+                            return transformer.apply(context);
+                        }
+                    });
+                }
+                leg.guardInterceptor().ifPresent(interceptors::add);
+
+                legDefinitions.add(new ScatterHandler.LegDefinition(leg, httpClient, interceptors));
+            }
+
+            ScatterHandler handler = new ScatterHandler(scatterRoute, legDefinitions);
+            var vertxRoute = scatterRoute.needsRegexRouting()
+                    ? router.routeWithRegex(scatterRoute.resolvedPath())
+                    : router.route(scatterRoute.resolvedPath());
+            vertxRoute.handler(handler);
         }
     }
 
