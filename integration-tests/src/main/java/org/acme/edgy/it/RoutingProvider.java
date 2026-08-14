@@ -4,12 +4,15 @@ import static org.acme.edgy.runtime.api.utils.StatusCode.OK;
 
 import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.inject.Produces;
 
+import org.acme.edgy.runtime.api.Leg;
 import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
+import org.acme.edgy.runtime.api.ScatterRoute;
 import org.acme.edgy.runtime.api.resiliency.SmallRyeFaultToleranceGuardHandler;
 import org.acme.edgy.runtime.api.utils.StatusCode;
 
@@ -17,6 +20,7 @@ import io.smallrye.faulttolerance.api.RateLimitException;
 import io.smallrye.faulttolerance.api.RateLimitType;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
@@ -28,6 +32,7 @@ class RoutingProvider {
         return new RoutingConfigurationBuilder(RoutingConfiguration.builder())
                 .addRoutes(this::storkRoutes)
                 .addRoutes(this::resiliencyRoutes)
+                .addRoutes(this::scatterRoutes)
                 .build();
     }
 
@@ -145,6 +150,21 @@ class RoutingProvider {
                                 .build(),
                                 StatusCode.SC_SUCCESS,
                                 (ctx, throwable) -> fallbackResponse(ctx, "Retry fallback")));
+    }
+
+    private RoutingConfiguration.Builder scatterRoutes(RoutingConfiguration.Builder builder) {
+        return builder
+                .addScatterRoute(new ScatterRoute("/scatter")
+                        .addLeg(new Leg(Origin.of("scatter-alpha", "http://localhost:8081/api/scatter/alpha"))
+                                .setMethod(HttpMethod.GET))
+                        .addLeg(new Leg(Origin.of("scatter-beta", "http://localhost:8081/api/scatter/beta"))
+                                .setMethod(HttpMethod.GET))
+                        .setComposer(responses -> {
+                            String composed = responses.stream()
+                                    .map(r -> r.body().toString())
+                                    .collect(Collectors.joining("+"));
+                            return Future.succeededFuture(Buffer.buffer(composed));
+                        }));
     }
 
     private Future<ProxyResponse> fallbackResponse(ProxyContext ctx, String body) {
