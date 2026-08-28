@@ -1,9 +1,6 @@
 package org.acme.edgy.deployment;
 
-import java.util.function.BooleanSupplier;
-
 import org.acme.edgy.runtime.CertificateUpdateEventListener;
-import org.acme.edgy.runtime.DynamicRoutingConfigurationProvider;
 import org.acme.edgy.runtime.OriginHttpClientManager;
 import org.acme.edgy.runtime.RouterConfigurator;
 import org.acme.edgy.runtime.config.EdgyBuildTimeConfig;
@@ -36,21 +33,6 @@ class EdgyProcessor {
         additionalBeans.produce(new AdditionalBeanBuildItem(CertificateUpdateEventListener.class));
         additionalBeans.produce(new AdditionalBeanBuildItem(OriginHttpClientManager.class));
         additionalBeans.produce(new AdditionalBeanBuildItem(RouterConfigurator.class));
-    }
-
-    @BuildStep(onlyIf = IsDynamicallyConfigured.class)
-    AdditionalBeanBuildItem addDynamicRoutingProvider() {
-        return new AdditionalBeanBuildItem(DynamicRoutingConfigurationProvider.class);
-    }
-
-    static class IsDynamicallyConfigured implements BooleanSupplier {
-
-        EdgyBuildTimeConfig config;
-
-        @Override
-        public boolean getAsBoolean() {
-            return config.mode() == EdgyBuildTimeConfig.Mode.CONFIGURATION;
-        }
     }
 
     @BuildStep

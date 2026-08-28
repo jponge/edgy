@@ -14,18 +14,6 @@ import io.smallrye.config.WithDefault;
 @ConfigRoot(phase = ConfigPhase.BUILD_TIME)
 public interface EdgyBuildTimeConfig {
 
-    // TODO: use @LookupIfProperty to flip which model provider bean will be handling the router configuration
-    enum Mode {
-        API,
-        CONFIGURATION,
-    }
-
-    /**
-     * The configuration mode.
-     */
-    @WithDefault("api")
-    Mode mode();
-
     /**
      * Tracing configuration.
      */
