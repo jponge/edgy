@@ -59,6 +59,7 @@ class EdgyTracingTest {
                     .satisfies(serverSpan -> {
                         var attrs = serverSpan.getAttributes();
                         SoftAssertions.assertSoftly(softly -> {
+                            // edgy specific attributes of the server span
                             softly.assertThat(attrs.get(AttributeKey.stringKey("edgy.origin.url")))
                                     .isEqualTo("http://localhost:8081/test/hello");
                             softly.assertThat(attrs.get(AttributeKey.stringKey("edgy.origin.id")))

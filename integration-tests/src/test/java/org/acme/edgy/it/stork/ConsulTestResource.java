@@ -39,6 +39,11 @@ public class ConsulTestResource implements QuarkusTestResourceLifecycleManager {
         config.put("quarkus.tls.my-tls-client.key-store.p12.password", "password");
         config.put("quarkus.tls.my-tls-client.trust-store.p12.path", "target/certs/edgy-client-truststore.p12");
         config.put("quarkus.tls.my-tls-client.trust-store.p12.password", "password");
+        // Scatter service discovery configuration
+        config.put("quarkus.stork.scatter-service.service-discovery.type", "consul");
+        config.put("quarkus.stork.scatter-service.service-discovery.consul-host", container.getHost());
+        config.put("quarkus.stork.scatter-service.service-discovery.consul-port",
+                Integer.toString(container.getMappedPort(8500)));
 
         return config;
     }
