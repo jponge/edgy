@@ -1,6 +1,7 @@
 package org.acme.edgy.runtime.api.resiliency;
 
 import java.util.concurrent.Callable;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import jakarta.enterprise.util.TypeLiteral;
@@ -9,7 +10,9 @@ import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenExce
 
 import io.smallrye.faulttolerance.api.RateLimitException;
 import io.smallrye.faulttolerance.api.TypedGuard;
+import io.vertx.core.Expectation;
 import io.vertx.core.Future;
+import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
 /**
@@ -23,11 +26,20 @@ public final class SmallRyeFaultToleranceGuardHandler implements GuardHandler {
 
     private final TypedGuard<Future<ProxyResponse>> guard;
     private final boolean needsBuffering;
+    private final Expectation<ProxyResponse> expectation;
+    private final BiFunction<ProxyContext, Throwable, Future<ProxyResponse>> fallback;
+    private final long maxPayloadSize;
 
     private SmallRyeFaultToleranceGuardHandler(TypedGuard<Future<ProxyResponse>> guard,
-            boolean needsBuffering) {
+            boolean needsBuffering,
+            Expectation<ProxyResponse> expectation,
+            BiFunction<ProxyContext, Throwable, Future<ProxyResponse>> fallback,
+            long maxPayloadSize) {
         this.guard = guard;
         this.needsBuffering = needsBuffering;
+        this.expectation = expectation;
+        this.fallback = fallback;
+        this.maxPayloadSize = maxPayloadSize;
     }
 
     public static Builder builder() {
@@ -52,6 +64,21 @@ public final class SmallRyeFaultToleranceGuardHandler implements GuardHandler {
         return needsBuffering;
     }
 
+    @Override
+    public Expectation<ProxyResponse> expectation() {
+        return expectation;
+    }
+
+    @Override
+    public BiFunction<ProxyContext, Throwable, Future<ProxyResponse>> fallback() {
+        return fallback;
+    }
+
+    @Override
+    public long maxPayloadSize() {
+        return maxPayloadSize;
+    }
+
     public static final class Builder {
 
         private final TypedGuard.Builder<Future<ProxyResponse>> delegate;
@@ -60,6 +87,10 @@ public final class SmallRyeFaultToleranceGuardHandler implements GuardHandler {
         private Consumer<TypedGuard.Builder.BulkheadBuilder<Future<ProxyResponse>>> bulkheadConsumer;
         private Consumer<TypedGuard.Builder.CircuitBreakerBuilder<Future<ProxyResponse>>> circuitBreakerConsumer;
         private Consumer<TypedGuard.Builder.RetryBuilder<Future<ProxyResponse>>> retryConsumer;
+        private Expectation<ProxyResponse> expectation;
+        private BiFunction<ProxyContext, Throwable, Future<ProxyResponse>> fallback;
+        private long maxPayloadSize = -1;
+
         Builder() {
             this.delegate = TypedGuard.create(new TypeLiteral<Future<ProxyResponse>>() {
             });
@@ -89,6 +120,22 @@ public final class SmallRyeFaultToleranceGuardHandler implements GuardHandler {
             return this;
         }
 
+        public Builder withExpectation(Expectation<ProxyResponse> expectation) {
+            this.expectation = expectation;
+            return this;
+        }
+
+        public Builder withFallback(
+                BiFunction<ProxyContext, Throwable, Future<ProxyResponse>> fallback) {
+            this.fallback = fallback;
+            return this;
+        }
+
+        public Builder withMaxPayloadSize(long maxPayloadSize) {
+            this.maxPayloadSize = maxPayloadSize;
+            return this;
+        }
+
         public SmallRyeFaultToleranceGuardHandler build() {
             if (rateLimitConsumer != null) {
                 var rl = delegate.withRateLimit();
@@ -110,7 +157,11 @@ public final class SmallRyeFaultToleranceGuardHandler implements GuardHandler {
                 retryConsumer.accept(rt);
                 rt.done();
             }
-            return new SmallRyeFaultToleranceGuardHandler(delegate.build(), retryConsumer != null);
+            Expectation<ProxyResponse> resolvedExpectation = expectation != null
+                    ? expectation
+                    : DEFAULT_EXPECTATION;
+            return new SmallRyeFaultToleranceGuardHandler(delegate.build(),
+                    retryConsumer != null, resolvedExpectation, fallback, maxPayloadSize);
         }
     }
 }

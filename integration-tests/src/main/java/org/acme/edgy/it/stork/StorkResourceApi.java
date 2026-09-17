@@ -42,6 +42,8 @@ class StorkResourceApi {
     static final int SECOND_SERVICE_PORT = 8083;
     static final int FIRST_SECURED_SERVICE_PORT = 8084;
     static final int SECOND_SECURED_SERVICE_PORT = 8085;
+    static final int FIRST_SCATTER_SERVICE_PORT = 8086;
+    static final int SECOND_SCATTER_SERVICE_PORT = 8087;
     
     @GET
     @Path("/services")
@@ -84,7 +86,39 @@ class StorkResourceApi {
                 new ServiceOptions().setPort(SECOND_SECURED_SERVICE_PORT).setAddress("localhost")
                         .setName("my-secured-service").setId("second-secured"));
 
+        // Register scatter services
+        client.registerServiceAndAwait(
+                new ServiceOptions().setPort(FIRST_SCATTER_SERVICE_PORT).setAddress("localhost")
+                        .setName("scatter-service").setId("scatter-first"));
+        client.registerServiceAndAwait(
+                new ServiceOptions().setPort(SECOND_SCATTER_SERVICE_PORT).setAddress("localhost")
+                        .setName("scatter-service").setId("scatter-second"));
+
         return "consul started";
+    }
+
+    @GET
+    @Path("/scatter-services")
+    public String startScatterServices() {
+        vertx.createHttpServer()
+                .requestHandler(req -> {
+                    if (!req.path().equals("/scatter/endpoint")) {
+                        req.response().setStatusCode(NOT_FOUND).endAndForget();
+                        return;
+                    }
+                    req.response().endAndForget("leg-" + FIRST_SCATTER_SERVICE_PORT);
+                }).listenAndAwait(FIRST_SCATTER_SERVICE_PORT);
+
+        vertx.createHttpServer()
+                .requestHandler(req -> {
+                    if (!req.path().equals("/scatter/endpoint")) {
+                        req.response().setStatusCode(NOT_FOUND).endAndForget();
+                        return;
+                    }
+                    req.response().endAndForget("leg-" + SECOND_SCATTER_SERVICE_PORT);
+                }).listenAndAwait(SECOND_SCATTER_SERVICE_PORT);
+
+        return "scatter services started";
     }
 
     @GET

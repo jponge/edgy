@@ -112,4 +112,10 @@ class ResiliencyResourceApi {
     public RestResponse<Integer> retryFallbackCounterValue() {
         return RestResponse.ok(retryFallbackCounter.get());
     }
+
+    @POST
+    @Path("/echo")
+    public String echo(String body) {
+        return body;
+    }
 }

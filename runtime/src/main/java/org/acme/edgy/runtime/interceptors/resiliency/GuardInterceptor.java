@@ -1,9 +1,9 @@
 package org.acme.edgy.runtime.interceptors.resiliency;
 
+import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
 import static jakarta.ws.rs.core.HttpHeaders.RETRY_AFTER;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
 
 import org.acme.edgy.runtime.api.resiliency.CircuitBreakerRejectedException;
 import org.acme.edgy.runtime.api.resiliency.GuardHandler;
@@ -12,7 +12,6 @@ import org.acme.edgy.runtime.api.utils.ProxyErrorResponseBuilder;
 import org.acme.edgy.runtime.builtins.transformers.BodyAccumulator;
 import org.acme.edgy.runtime.builtins.transformers.BodySizeLimitExceededException;
 
-import io.vertx.core.Expectation;
 import io.vertx.core.Future;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
@@ -46,18 +45,9 @@ import io.vertx.httpproxy.ProxyResponse;
 public class GuardInterceptor implements ProxyInterceptor {
 
     private final GuardHandler handler;
-    private final Expectation<ProxyResponse> expectation;
-    private final BiFunction<ProxyContext, Throwable, Future<ProxyResponse>> fallback;
 
-    public GuardInterceptor(GuardHandler handler, Expectation<ProxyResponse> expectation) {
-        this(handler, expectation, null);
-    }
-
-    public GuardInterceptor(GuardHandler handler, Expectation<ProxyResponse> expectation,
-            BiFunction<ProxyContext, Throwable, Future<ProxyResponse>> fallback) {
+    public GuardInterceptor(GuardHandler handler) {
         this.handler = Objects.requireNonNull(handler);
-        this.expectation = Objects.requireNonNull(expectation);
-        this.fallback = fallback;
     }
 
     @Override
@@ -68,10 +58,30 @@ public class GuardInterceptor implements ProxyInterceptor {
 
         return preparation.compose(v -> {
             try {
-                return handler.execute(() -> context.sendRequest().expecting(expectation))
-                        .recover(throwable -> {
-                            if (fallback != null) {
-                                return fallback.apply(context, throwable);
+                return handler.execute(() -> {
+                    long maxSize = handler.maxPayloadSize();
+                    if (maxSize > 0) {
+                        String cl = context.request().headers().get(CONTENT_LENGTH);
+                        if (cl != null && Long.parseLong(cl) > maxSize) {
+                            return ProxyErrorResponseBuilder.create(context)
+                                    .payloadTooLarge()
+                                    .message("Body size exceeded the limit of " + maxSize + " bytes")
+                                    .sendResponseInRequestTransformer()
+                                    .expecting(handler.expectation());
+                        }
+                        Body body = context.request().getBody();
+                        if (body != null) {
+                            return BodyAccumulator.readBodyBuffer(body, maxSize).compose(buf -> {
+                                context.request().setBody(Body.body(buf));
+                                return context.sendRequest().expecting(handler.expectation());
+                            });
+                        }
+                    }
+                    return context.sendRequest().expecting(handler.expectation());
+                }).recover(throwable -> {
+                            var fb = handler.fallback();
+                            if (fb != null) {
+                                return fb.apply(context, throwable);
                             }
                             if (throwable instanceof RateLimitRejectedException rateLimitException) {
                                 String retryAfterValue = String

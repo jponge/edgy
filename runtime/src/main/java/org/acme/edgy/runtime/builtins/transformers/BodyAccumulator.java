@@ -6,6 +6,7 @@ import io.quarkus.runtime.configuration.MemorySize;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.streams.ReadStream;
 import io.vertx.httpproxy.Body;
 
 public final class BodyAccumulator {
@@ -16,15 +17,19 @@ public final class BodyAccumulator {
     }
 
     public static Future<Buffer> readBodyBuffer(Body body) {
-        long maxBodySize = getMaxBodySize();
+        return readBodyBuffer(body, getMaxBodySize());
+    }
+
+    public static Future<Buffer> readBodyBuffer(Body body, long maxBodySize) {
+        ReadStream<Buffer> stream = body.stream();
         Promise<Buffer> promise = Promise.promise();
         Buffer accumulator = Buffer.buffer();
 
-        body.stream().handler(chunk -> {
+        stream.handler(chunk -> {
             if (chunk != null) {
                 if (accumulator.length() + chunk.length() > maxBodySize) {
                     promise.fail(new BodySizeLimitExceededException(
-                            "Body size exceeded the configured limit of " + maxBodySize + " bytes"));
+                            "Body size exceeded the limit of " + maxBodySize + " bytes"));
                     return;
                 }
                 accumulator.appendBuffer(chunk);

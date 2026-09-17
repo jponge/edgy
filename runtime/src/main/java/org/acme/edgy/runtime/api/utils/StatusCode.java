@@ -33,6 +33,7 @@ public final class StatusCode {
 
     public static final Expectation<ProxyResponse> SC_SUCCESS = response -> isSuccess(response.getStatusCode());
     public static final Expectation<ProxyResponse> SC_NON_ERROR = response -> !isError(response.getStatusCode());
+    public static final Expectation<ProxyResponse> SC_NON_SERVER_ERROR = response -> !isServerError(response.getStatusCode());
 
     private StatusCode() {
     }

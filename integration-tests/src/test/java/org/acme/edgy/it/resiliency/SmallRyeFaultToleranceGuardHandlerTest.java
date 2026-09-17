@@ -3,10 +3,12 @@ package org.acme.edgy.it.resiliency;
 import static jakarta.ws.rs.core.HttpHeaders.RETRY_AFTER;
 import static org.acme.edgy.runtime.api.utils.StatusCode.BAD_GATEWAY;
 import static org.acme.edgy.runtime.api.utils.StatusCode.OK;
+import static org.acme.edgy.runtime.api.utils.StatusCode.PAYLOAD_TOO_LARGE;
 import static org.acme.edgy.runtime.api.utils.StatusCode.SERVICE_UNAVAILABLE;
 import static org.acme.edgy.runtime.api.utils.StatusCode.TOO_MANY_REQUESTS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 import java.util.ArrayList;
@@ -306,6 +308,14 @@ class SmallRyeFaultToleranceGuardHandlerTest {
     }
 
     @Test
+    void testExpectationWithFallback() {
+        // no guard handler — just expectation + fallback
+        // backend always returns 500, SC_SUCCESS expectation fails, fallback kicks in
+        RestAssured.given().when().get("/expectation-with-fallback").then().statusCode(OK).and()
+                .body(Matchers.equalTo("Expectation fallback"));
+    }
+
+    @Test
     void testRetryWithFallback() {
         RestAssured.given().when().get("/api/resiliency/retry-fallback-reset").then().statusCode(OK);
 
@@ -318,5 +328,165 @@ class SmallRyeFaultToleranceGuardHandlerTest {
         String counter = RestAssured.given().when().get("/api/resiliency/retry-fallback-counter")
                 .then().statusCode(OK).extract().body().asString();
         assertThat(counter).as("Backend should be hit 3 times (1 initial + 2 retries)").isEqualTo("3");
+    }
+
+    @Test
+    void testPayloadWithinLimit() {
+        String smallBody = "hello";
+        RestAssured.given()
+                .body(smallBody)
+                .when().post("/payload-limit")
+                .then().statusCode(OK)
+                .body(Matchers.equalTo(smallBody));
+    }
+
+    @Test
+    void testPayloadExceedsLimit() {
+        String largeBody = "x".repeat(100);
+        RestAssured.given()
+                .body(largeBody)
+                .when().post("/payload-limit")
+                .then().statusCode(PAYLOAD_TOO_LARGE);
+    }
+
+    // ----------------------------- PASSTHROUGH -----------------------------
+
+    @Test
+    void testGuardPassthrough() {
+        RestAssured.given()
+                .when().get("/guard-passthrough")
+                .then().statusCode(OK);
+    }
+
+    // ----------------------------- SCATTER GUARD -----------------------------
+
+    @Test
+    void testScatterGuardFallbackOnLeg() {
+        // First call: CB monitors, backend returns 500, fallback activates
+        RestAssured.given()
+                .get("/scatter-guard")
+                .then()
+                .statusCode(OK);
+
+        // Second call: CB opens, fallback activates
+        RestAssured.given()
+                .get("/scatter-guard")
+                .then()
+                .statusCode(OK)
+                .body(is("healthy|guard-fallback"));
+    }
+
+    @Test
+    void testScatterGuardOnOneLegWithFallback() {
+        RestAssured.given()
+                .get("/scatter-guard-fallback")
+                .then()
+                .statusCode(OK)
+                .body(is("healthy|guard-fallback"));
+    }
+
+    @Test
+    void testScatterGuardWithPayloadLimit() {
+        RestAssured.given()
+                .body("x".repeat(17))
+                .post("/scatter-payload-limit")
+                .then()
+                .statusCode(BAD_GATEWAY);
+    }
+
+    @Test
+    void testScatterPayloadWithinLimit() {
+        String smallBody = "hello";
+        RestAssured.given()
+                .body(smallBody)
+                .post("/scatter-payload-ok")
+                .then()
+                .statusCode(OK)
+                .body(is(smallBody + "|healthy"));
+    }
+
+    @Test
+    void testScatterGuardOnAllLegsWithFallback() {
+        RestAssured.given()
+                .get("/scatter-guard-all-legs")
+                .then()
+                .statusCode(OK)
+                .body(is("fallback-1|fallback-2"));
+    }
+
+    @Test
+    void testScatterGuardPassthrough() {
+        RestAssured.given()
+                .get("/scatter-guard-passthrough")
+                .then()
+                .statusCode(OK)
+                .body(is("healthy|healthy"));
+    }
+
+    @Test
+    void testScatterRetryOnLeg() {
+        RestAssured.given().when().get("/api/scatter/retry-reset").then().statusCode(OK);
+
+        // retry leg: fails 2 times, then succeeds on 3rd attempt (maxRetries=3)
+        RestAssured.given()
+                .get("/scatter-guard-retry")
+                .then()
+                .statusCode(OK)
+                .body(is("healthy|retry-ok"));
+    }
+
+    @Test
+    void testScatterCircuitBreakerNoFallbackFails() {
+        // CB on one leg, no fallback, FAIL_FAST — backend returns 500,
+        // expectation fails, CB records failure, no fallback → leg fails → 502
+        RestAssured.given()
+                .get("/scatter-cb-no-fallback")
+                .then()
+                .statusCode(BAD_GATEWAY);
+    }
+
+    @Test
+    void testScatterRateLimitOnLeg() {
+        // rate limit: 1 request per 1000ms fixed window
+        // first request succeeds
+        RestAssured.given()
+                .get("/scatter-rate-limit")
+                .then()
+                .statusCode(OK)
+                .body(is("healthy|healthy"));
+
+        // second request: rate-limited leg fails, but PARTIAL mode delivers to composer
+        RestAssured.given()
+                .get("/scatter-rate-limit")
+                .then()
+                .statusCode(OK);
+    }
+
+    @Test
+    void testScatterRateLimitWithFallbackOnLeg() {
+        // rate limit: 1 request per 1000ms fixed window + fallback
+        // first request succeeds
+        RestAssured.given()
+                .get("/scatter-rate-limit-fallback")
+                .then()
+                .statusCode(OK)
+                .body(is("healthy|healthy"));
+
+        // second request: rate-limited leg triggers fallback
+        RestAssured.given()
+                .get("/scatter-rate-limit-fallback")
+                .then()
+                .statusCode(OK)
+                .body(is("healthy|rate-limit-fallback"));
+    }
+
+    @Test
+    void testScatterRetryExhaustedNoFallbackFails() {
+        // retry on one leg (maxRetries=2), backend always fails, no fallback
+        // FAIL_FAST → entire scatter fails → 502
+        RestAssured.given()
+                .get("/scatter-retry-fail")
+                .then()
+                .statusCode(BAD_GATEWAY);
     }
 }

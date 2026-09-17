@@ -1,8 +1,10 @@
 package org.acme.edgy.it.stork;
 
 import static io.restassured.RestAssured.given;
+import static org.acme.edgy.it.stork.StorkResourceApi.FIRST_SCATTER_SERVICE_PORT;
 import static org.acme.edgy.it.stork.StorkResourceApi.FIRST_SECURED_SERVICE_PORT;
 import static org.acme.edgy.it.stork.StorkResourceApi.FIRST_SERVICE_PORT;
+import static org.acme.edgy.it.stork.StorkResourceApi.SECOND_SCATTER_SERVICE_PORT;
 import static org.acme.edgy.it.stork.StorkResourceApi.SECOND_SECURED_SERVICE_PORT;
 import static org.acme.edgy.it.stork.StorkResourceApi.SECOND_SERVICE_PORT;
 import static org.acme.edgy.runtime.api.utils.StatusCode.OK;
@@ -54,6 +56,12 @@ class EdgyStorkConsulTest {
                 .then()
                 .statusCode(OK);
 
+        // starts scatter services
+        given()
+                .when().get("/api/stork/scatter-services")
+                .then()
+                .statusCode(OK);
+
         // registers services in consul
         given()
                 .when().get("/api/stork/consul")
@@ -77,6 +85,18 @@ class EdgyStorkConsulTest {
         for (int i = firstOrSecondIndex; i < 9 + firstOrSecondIndex; i++) {
             assertThat(assertTestEndpointAndGetBody("/test-secured")).isEqualTo(expectedSecuredBodies.get(i % 2));
         }
+    }
+
+    @Test
+    void scatterWithStorkServiceDiscoveryResolvesLegs() {
+        String response = assertTestEndpointAndGetBody("/scatter-stork");
+
+        String expected1 = "leg-" + FIRST_SCATTER_SERVICE_PORT + "|leg-" + SECOND_SCATTER_SERVICE_PORT;
+        String expected2 = "leg-" + SECOND_SCATTER_SERVICE_PORT + "|leg-" + FIRST_SCATTER_SERVICE_PORT;
+
+        assertThat(response).satisfiesAnyOf(
+                r -> assertThat(r).isEqualTo(expected1),
+                r -> assertThat(r).isEqualTo(expected2));
     }
 
     private String assertTestEndpointAndGetBody(String path) {

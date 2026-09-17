@@ -1,8 +1,13 @@
 package org.acme.edgy.runtime.api.resiliency;
 
 import java.util.concurrent.Callable;
+import java.util.function.BiFunction;
 
+import org.acme.edgy.runtime.api.utils.StatusCode;
+
+import io.vertx.core.Expectation;
 import io.vertx.core.Future;
+import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
 /**
@@ -14,6 +19,8 @@ import io.vertx.httpproxy.ProxyResponse;
  * @see org.acme.edgy.runtime.api.Route#setGuardHandler(GuardHandler)
  */
 public interface GuardHandler {
+
+    Expectation<ProxyResponse> DEFAULT_EXPECTATION = StatusCode.SC_NON_SERVER_ERROR;
 
     /**
      * Executes the given action wrapped with the configured resilience
@@ -30,4 +37,16 @@ public interface GuardHandler {
      * so that it can be re-sent on retries or replays.
      */
     boolean needsBuffering();
+
+    default Expectation<ProxyResponse> expectation() {
+        return DEFAULT_EXPECTATION;
+    }
+
+    default BiFunction<ProxyContext, Throwable, Future<ProxyResponse>> fallback() {
+        return null;
+    }
+
+    default long maxPayloadSize() {
+        return -1;
+    }
 }
