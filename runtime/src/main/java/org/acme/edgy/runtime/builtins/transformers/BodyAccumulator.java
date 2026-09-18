@@ -17,7 +17,7 @@ public final class BodyAccumulator {
     }
 
     public static Future<Buffer> readBodyBuffer(Body body) {
-        return readBodyBuffer(body, getMaxBodySize());
+        return readBodyBuffer(body, maxBodySize());
     }
 
     public static Future<Buffer> readBodyBuffer(Body body, long maxBodySize) {
@@ -47,7 +47,7 @@ public final class BodyAccumulator {
         return promise.future();
     }
 
-    private static long getMaxBodySize() {
+    private static long maxBodySize() {
         return ConfigProvider.getConfig()
                 .getValue(MAX_BODY_SIZE_KEY, MemorySize.class)
                 .asLongValue();

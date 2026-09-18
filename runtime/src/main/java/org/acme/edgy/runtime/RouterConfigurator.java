@@ -41,13 +41,16 @@ public class RouterConfigurator {
 
     private final RoutingConfiguration routingConfiguration;
     private final OriginHttpClientManager originHttpClientManager;
+    private final OriginCacheManager originCacheManager;
     private final List<ProxyObserver> observers;
 
     RouterConfigurator(RoutingConfiguration routingConfiguration,
             OriginHttpClientManager originHttpClientManager,
+            OriginCacheManager originCacheManager,
             @All List<ProxyObserver> observers) {
         this.routingConfiguration = routingConfiguration;
         this.originHttpClientManager = originHttpClientManager;
+        this.originCacheManager = originCacheManager;
         this.observers = observers;
     }
 
@@ -68,6 +71,7 @@ public class RouterConfigurator {
 
         addInterceptor(proxy::addInterceptor, new ObservingProxyInterceptor(observers, route), !observers.isEmpty());
         addInterceptor(proxy::addInterceptor, new MethodBodyInterceptor(route), route.methodOverride() != null);
+        originCacheManager.interceptorFor(route.origin()).ifPresent(proxy::addInterceptor);
         addInterceptor(proxy::addInterceptor, new UriTemplateInterceptor(route));
         addInterceptor(proxy::addInterceptor, new QueryParamPropagationInterceptor());
 
@@ -101,6 +105,7 @@ public class RouterConfigurator {
 
             List<ProxyInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new ScatterMethodBodyInterceptor(effectiveMethod, effectiveKeepBody));
+            originCacheManager.interceptorFor(leg.origin()).ifPresent(interceptors::add);
             addInterceptor(interceptors::add, new UriTemplateInterceptor(syntheticRoute));
             addInterceptor(interceptors::add, new QueryParamPropagationInterceptor());
 

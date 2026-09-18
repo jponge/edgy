@@ -13,6 +13,7 @@ import org.acme.edgy.runtime.api.ProxyObserver;
 import org.acme.edgy.runtime.api.Route;
 import org.acme.edgy.runtime.api.ScatterObservation;
 import org.acme.edgy.runtime.api.ScatterRoute;
+import org.acme.edgy.runtime.cache.CacheStatus;
 import org.jboss.logging.Logger;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -45,6 +46,7 @@ public class OTelTracingProxyObserver implements ProxyObserver {
     static final AttributeKey<Long> EDGY_SCATTER_LEGS_SUCCEEDED = AttributeKey.longKey("edgy.scatter.legs.succeeded");
     static final AttributeKey<Long> EDGY_SCATTER_LEGS_FAILED = AttributeKey.longKey("edgy.scatter.legs.failed");
     static final AttributeKey<Long> EDGY_LEG_STATUS = AttributeKey.longKey("edgy.leg.status");
+    static final AttributeKey<String> EDGY_CACHE_STATUS = AttributeKey.stringKey("edgy.cache.status");
 
     private final Tracer tracer;
 
@@ -64,7 +66,25 @@ public class OTelTracingProxyObserver implements ProxyObserver {
         span.setAttribute(EDGY_ORIGIN_ID, route.origin().identifier());
         span.setAttribute(EDGY_ROUTE, route.path());
 
-        return ProxyObservation.NOOP;
+        // cache status is only known once the chain unwinds
+        return new ProxyObservation() {
+            @Override
+            public void end(ProxyContext context) {
+                recordCacheStatus(span, context);
+            }
+
+            @Override
+            public void error(ProxyContext context, Throwable error) {
+                recordCacheStatus(span, context);
+            }
+        };
+    }
+
+    private static void recordCacheStatus(Span span, ProxyContext context) {
+        CacheStatus status = context.get(CacheStatus.CONTEXT_KEY, CacheStatus.class);
+        if (status != null) {
+            span.setAttribute(EDGY_CACHE_STATUS, status.name());
+        }
     }
 
     @Override
