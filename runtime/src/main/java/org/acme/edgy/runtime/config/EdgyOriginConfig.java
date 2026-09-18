@@ -25,4 +25,9 @@ public interface EdgyOriginConfig {
      */
     OptionalInt maxPoolSize();
 
+    /**
+     * Response caching for this origin.
+     */
+    EdgyOriginCacheConfig cache();
+
 }

@@ -1,6 +1,7 @@
 package org.acme.edgy.deployment;
 
 import org.acme.edgy.runtime.CertificateUpdateEventListener;
+import org.acme.edgy.runtime.OriginCacheManager;
 import org.acme.edgy.runtime.OriginHttpClientManager;
 import org.acme.edgy.runtime.RouterConfigurator;
 import org.acme.edgy.runtime.config.EdgyBuildTimeConfig;
@@ -31,6 +32,7 @@ class EdgyProcessor {
     @BuildStep
     void setupAdditionalBeans(BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         additionalBeans.produce(new AdditionalBeanBuildItem(CertificateUpdateEventListener.class));
+        additionalBeans.produce(new AdditionalBeanBuildItem(OriginCacheManager.class));
         additionalBeans.produce(new AdditionalBeanBuildItem(OriginHttpClientManager.class));
         additionalBeans.produce(new AdditionalBeanBuildItem(RouterConfigurator.class));
     }
