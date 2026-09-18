@@ -1,7 +1,7 @@
 package org.acme.edgy.deployment;
 
 import org.acme.edgy.runtime.CertificateUpdateEventListener;
-import org.acme.edgy.runtime.OriginHttpClientManager;
+import org.acme.edgy.runtime.OriginManager;
 import org.acme.edgy.runtime.RouterConfigurator;
 import org.acme.edgy.runtime.config.EdgyBuildTimeConfig;
 import org.acme.edgy.runtime.logging.LoggingProxyObserver;
@@ -31,7 +31,7 @@ class EdgyProcessor {
     @BuildStep
     void setupAdditionalBeans(BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         additionalBeans.produce(new AdditionalBeanBuildItem(CertificateUpdateEventListener.class));
-        additionalBeans.produce(new AdditionalBeanBuildItem(OriginHttpClientManager.class));
+        additionalBeans.produce(new AdditionalBeanBuildItem(OriginManager.class));
         additionalBeans.produce(new AdditionalBeanBuildItem(RouterConfigurator.class));
     }
 

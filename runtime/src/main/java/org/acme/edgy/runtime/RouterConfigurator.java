@@ -40,14 +40,14 @@ import io.vertx.httpproxy.ProxyResponse;
 public class RouterConfigurator {
 
     private final RoutingConfiguration routingConfiguration;
-    private final OriginHttpClientManager originHttpClientManager;
+    private final OriginManager originManager;
     private final List<ProxyObserver> observers;
 
     RouterConfigurator(RoutingConfiguration routingConfiguration,
-            OriginHttpClientManager originHttpClientManager,
+            OriginManager originManager,
             @All List<ProxyObserver> observers) {
         this.routingConfiguration = routingConfiguration;
-        this.originHttpClientManager = originHttpClientManager;
+        this.originManager = originManager;
         this.observers = observers;
     }
 
@@ -62,12 +62,15 @@ public class RouterConfigurator {
     }
 
     private void configureRoute(Router router, Route route) {
-        HttpClient httpClient = originHttpClientManager.getOrCreateHttpClient(route.origin());
+        HttpClient httpClient = originManager.getOrCreateHttpClient(route.origin());
+        originManager.initializeCacheInterceptor(route.origin());
+
         HttpProxy proxy = HttpProxy.reverseProxy(httpClient)
                 .origin(route.origin().originRequestProvider());
 
         addInterceptor(proxy::addInterceptor, new ObservingProxyInterceptor(observers, route), !observers.isEmpty());
         addInterceptor(proxy::addInterceptor, new MethodBodyInterceptor(route), route.methodOverride() != null);
+        route.origin().cacheInterceptor().ifPresent(proxy::addInterceptor);
         addInterceptor(proxy::addInterceptor, new UriTemplateInterceptor(route));
         addInterceptor(proxy::addInterceptor, new QueryParamPropagationInterceptor());
 
@@ -80,7 +83,8 @@ public class RouterConfigurator {
         List<ScatterHandler.LegDefinition> legDefinitions = new ArrayList<>();
 
         for (Leg leg : scatterRoute.legs()) {
-            HttpClient httpClient = originHttpClientManager.getOrCreateHttpClient(leg.origin());
+            HttpClient httpClient = originManager.getOrCreateHttpClient(leg.origin());
+            originManager.initializeCacheInterceptor(leg.origin());
             Route syntheticRoute = new Route(scatterRoute.path(), leg.origin(), scatterRoute.pathMode());
 
             // precedence: leg-level overrides scatter-level
@@ -101,6 +105,7 @@ public class RouterConfigurator {
 
             List<ProxyInterceptor> interceptors = new ArrayList<>();
             interceptors.add(new ScatterMethodBodyInterceptor(effectiveMethod, effectiveKeepBody));
+            leg.origin().cacheInterceptor().ifPresent(interceptors::add);
             addInterceptor(interceptors::add, new UriTemplateInterceptor(syntheticRoute));
             addInterceptor(interceptors::add, new QueryParamPropagationInterceptor());
 

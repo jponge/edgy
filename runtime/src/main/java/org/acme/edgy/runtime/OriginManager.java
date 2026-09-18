@@ -9,8 +9,10 @@ import java.util.Map;
 import jakarta.inject.Singleton;
 
 import org.acme.edgy.runtime.api.Origin;
+import org.acme.edgy.runtime.config.EdgyOriginCacheConfig;
 import org.acme.edgy.runtime.config.EdgyOriginConfig;
 import org.acme.edgy.runtime.config.EdgyRuntimeConfig;
+import org.acme.edgy.runtime.interceptors.CacheInterceptor;
 import org.jboss.logging.Logger;
 
 import io.quarkus.runtime.configuration.ConfigurationException;
@@ -19,11 +21,19 @@ import io.quarkus.tls.runtime.config.TlsConfig;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
+import io.vertx.httpproxy.cache.CacheOptions;
 
+/**
+ * Creates the resources an {@link Origin} owns and assigns them to it.
+ * <p>
+ * An HTTP client and a cache interceptor are created per origin identifier, so
+ * cache configuration ({@code enabled}, {@code max-size}, {@code max-entry-size})
+ * applies independently per identifier.
+ */
 @Singleton
-public class OriginHttpClientManager {
+public class OriginManager {
 
-    private static final Logger logger = Logger.getLogger(OriginHttpClientManager.class);
+    private static final Logger logger = Logger.getLogger(OriginManager.class);
 
     private final Map<String, Origin> origins = new HashMap<>();
     private final Map<String, List<HttpClient>> tlsConfigToHttpClients = new HashMap<>();
@@ -32,7 +42,7 @@ public class OriginHttpClientManager {
     private final TlsConfigurationRegistry tlsConfigurationRegistry;
     private final EdgyRuntimeConfig edgyRuntimeConfig;
 
-    OriginHttpClientManager(Vertx vertx, TlsConfigurationRegistry tlsConfigurationRegistry,
+    OriginManager(Vertx vertx, TlsConfigurationRegistry tlsConfigurationRegistry,
             EdgyRuntimeConfig edgyRuntimeConfig) {
         this.vertx = vertx;
         this.tlsConfigurationRegistry = tlsConfigurationRegistry;
@@ -67,6 +77,23 @@ public class OriginHttpClientManager {
         }
         origin.setHttpClient(httpClient);
         return httpClient;
+    }
+
+    public void initializeCacheInterceptor(Origin origin) {
+        if (origin.cacheInterceptor().isPresent()) {
+            return;
+        }
+
+        EdgyOriginConfig originConfig = edgyRuntimeConfig.origins().get(origin.identifier());
+        if (originConfig == null || !originConfig.cache().enabled()) {
+            return;
+        }
+
+        EdgyOriginCacheConfig cacheConfig = originConfig.cache();
+        CacheInterceptor interceptor = new CacheInterceptor(
+                new CacheOptions().setMaxSize(cacheConfig.maxSize()),
+                cacheConfig.maxEntrySize().asLongValue());
+        origin.setCacheInterceptor(interceptor);
     }
 
     public List<HttpClient> clientsUsingTlsConfig(String tlsConfigName) {

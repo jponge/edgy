@@ -14,9 +14,9 @@ public class CertificateUpdateEventListener {
 
     private static final Logger logger = Logger.getLogger(CertificateUpdateEventListener.class);
 
-    private final OriginHttpClientManager originHttpClientManager;
+    private final OriginManager originHttpClientManager;
 
-    CertificateUpdateEventListener(OriginHttpClientManager originHttpClientManager) {
+    CertificateUpdateEventListener(OriginManager originHttpClientManager) {
         this.originHttpClientManager = originHttpClientManager;
     }
 
