@@ -9,6 +9,7 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
 
+/** Replaces the entire response body with a raw {@link Body}. */
 public class ResponseBodyModifier implements ResponseTransformer {
 
     private final Function<ProxyContext, Body> mapper;

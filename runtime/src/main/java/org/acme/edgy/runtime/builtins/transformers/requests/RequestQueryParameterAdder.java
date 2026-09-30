@@ -18,6 +18,11 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
+/**
+ * Appends query parameters to the request URI. Always adds — does not
+ * check for or replace existing parameters with the same name.
+ * An empty or null value collection adds the parameter with no value.
+ */
 public class RequestQueryParameterAdder implements RequestTransformer {
 
     private final String name;

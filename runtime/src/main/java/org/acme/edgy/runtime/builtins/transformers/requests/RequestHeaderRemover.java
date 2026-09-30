@@ -6,6 +6,7 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
+/** Removes a request header by name. No-op if the header is absent. */
 public class RequestHeaderRemover implements RequestTransformer {
 
     private final String name;

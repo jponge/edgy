@@ -9,6 +9,7 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
+/** Replaces a request header only if it already exists; no-op otherwise. */
 public class RequestHeaderReplacer implements RequestTransformer {
     private final String name;
     private final Function<ProxyContext, String> mapper;

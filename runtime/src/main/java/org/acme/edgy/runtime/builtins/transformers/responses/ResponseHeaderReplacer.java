@@ -8,6 +8,7 @@ import org.acme.edgy.runtime.api.ResponseTransformer;
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 
+/** Replaces a response header only if it already exists; no-op otherwise. */
 public class ResponseHeaderReplacer implements ResponseTransformer {
     private final String name;
     private final Function<ProxyContext, String> mapper;

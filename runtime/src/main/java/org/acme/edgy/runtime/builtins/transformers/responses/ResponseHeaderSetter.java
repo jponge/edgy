@@ -7,6 +7,7 @@ import org.acme.edgy.runtime.api.ResponseTransformer;
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 
+/** Sets a response header unconditionally, overwriting any existing value. */
 public class ResponseHeaderSetter implements ResponseTransformer {
 
     private final String name;

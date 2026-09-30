@@ -9,6 +9,7 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
+/** Sets a request header unconditionally, overwriting any existing value. */
 public class RequestHeaderSetter implements RequestTransformer {
 
     private final String name;

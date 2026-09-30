@@ -19,6 +19,10 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
+/**
+ * Replaces query parameter values only if the parameter already exists
+ * in the request URI; no-op otherwise.
+ */
 public class RequestQueryParameterReplacer implements RequestTransformer {
 
     private final String name;
