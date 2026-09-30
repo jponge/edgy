@@ -3,6 +3,10 @@ package org.acme.edgy.runtime.api;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Immutable collection of routing entries built via {@link Builder}.
+ * Produce a CDI bean of this type to register routes at startup.
+ */
 public class RoutingConfiguration {
 
     private final List<RoutingEntry> entries;

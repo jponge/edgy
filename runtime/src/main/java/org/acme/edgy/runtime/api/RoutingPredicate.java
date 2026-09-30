@@ -4,6 +4,13 @@ import java.util.function.Predicate;
 
 import io.vertx.ext.web.RoutingContext;
 
+/**
+ * Conditionally matches a request against a {@link Route} or
+ * {@link ScatterRoute}. When the predicate returns {@code false},
+ * the request falls through to the next matching path.
+ * <p>
+ * Compose with {@link #and}, {@link #or}, and {@link #negate}.
+ */
 @FunctionalInterface
 public interface RoutingPredicate extends Predicate<RoutingContext> {
 
