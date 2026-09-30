@@ -7,17 +7,17 @@ import org.acme.edgy.runtime.api.ResponseTransformer;
 import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 
-public class ResponseHeaderAdder implements ResponseTransformer {
+public class ResponseHeaderSetter implements ResponseTransformer {
 
     private final String name;
     private final Function<ProxyContext, String> mapper;
 
-    public ResponseHeaderAdder(String name, Function<ProxyContext, String> mapper) {
+    public ResponseHeaderSetter(String name, Function<ProxyContext, String> mapper) {
         this.name = name;
         this.mapper = mapper;
     }
 
-    public ResponseHeaderAdder(String name, String fixedValue) {
+    public ResponseHeaderSetter(String name, String fixedValue) {
         this(name, proxyContext -> fixedValue);
     }
 

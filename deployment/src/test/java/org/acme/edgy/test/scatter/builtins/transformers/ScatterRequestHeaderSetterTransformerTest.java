@@ -15,7 +15,7 @@ import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
 import org.acme.edgy.runtime.api.ScatterRoute;
 import org.acme.edgy.runtime.api.utils.StatusCode;
-import org.acme.edgy.runtime.builtins.transformers.requests.RequestHeaderAdder;
+import org.acme.edgy.runtime.builtins.transformers.requests.RequestHeaderSetter;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ import io.restassured.RestAssured;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 
-class ScatterRequestHeaderAdderTransformerTest {
+class ScatterRequestHeaderSetterTransformerTest {
 
     static class RoutingProvider {
 
@@ -42,9 +42,9 @@ class ScatterRequestHeaderAdderTransformerTest {
                                 return Future.succeededFuture(Buffer.buffer(composed));
                             },
                             new Leg(Origin.of("s1", "http://localhost:8081/test/leg-a"))
-                                    .addRequestTransformer(new RequestHeaderAdder("X-Custom-A", "injected-a")),
+                                    .addRequestTransformer(new RequestHeaderSetter("X-Custom-A", "injected-a")),
                             new Leg(Origin.of("s2", "http://localhost:8081/test/leg-b"))
-                                    .addRequestTransformer(new RequestHeaderAdder("X-Custom-B", "injected-b"))))
+                                    .addRequestTransformer(new RequestHeaderSetter("X-Custom-B", "injected-b"))))
                     .build();
         }
     }

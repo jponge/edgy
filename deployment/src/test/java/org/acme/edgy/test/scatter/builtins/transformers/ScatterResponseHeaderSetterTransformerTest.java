@@ -14,7 +14,7 @@ import org.acme.edgy.runtime.api.Origin;
 import org.acme.edgy.runtime.api.RoutingConfiguration;
 import org.acme.edgy.runtime.api.ScatterRoute;
 import org.acme.edgy.runtime.api.utils.StatusCode;
-import org.acme.edgy.runtime.builtins.transformers.responses.ResponseHeaderAdder;
+import org.acme.edgy.runtime.builtins.transformers.responses.ResponseHeaderSetter;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import io.restassured.RestAssured;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 
-class ScatterResponseHeaderAdderTransformerTest {
+class ScatterResponseHeaderSetterTransformerTest {
 
     private static final String LEG_MARKER_HEADER = "X-Leg-Marker";
 
@@ -43,9 +43,9 @@ class ScatterResponseHeaderAdderTransformerTest {
                                 return Future.succeededFuture(Buffer.buffer(headerValues));
                             },
                             new Leg(Origin.of("s1", "http://localhost:8081/test/leg-a"))
-                                    .addResponseTransformer(new ResponseHeaderAdder(LEG_MARKER_HEADER, "marker-a")),
+                                    .addResponseTransformer(new ResponseHeaderSetter(LEG_MARKER_HEADER, "marker-a")),
                             new Leg(Origin.of("s2", "http://localhost:8081/test/leg-b"))
-                                    .addResponseTransformer(new ResponseHeaderAdder(LEG_MARKER_HEADER, "marker-b"))))
+                                    .addResponseTransformer(new ResponseHeaderSetter(LEG_MARKER_HEADER, "marker-b"))))
                     .build();
         }
     }

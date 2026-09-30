@@ -9,23 +9,24 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
-public class RequestHeaderAdder implements RequestTransformer {
-
+public class RequestHeaderReplacer implements RequestTransformer {
     private final String name;
     private final Function<ProxyContext, String> mapper;
 
-    public RequestHeaderAdder(String name, Function<ProxyContext, String> mapper) {
+    public RequestHeaderReplacer(String name, Function<ProxyContext, String> mapper) {
         this.name = Objects.requireNonNull(name);
         this.mapper = Objects.requireNonNull(mapper);
     }
 
-    public RequestHeaderAdder(String name, String fixedValue) {
-        this(name, proxyContext -> fixedValue);
+    public RequestHeaderReplacer(String name, String newValue) {
+        this(name, proxyContext -> newValue);
     }
 
     @Override
     public Future<ProxyResponse> apply(ProxyContext proxyContext) {
-        proxyContext.request().putHeader(name, mapper.apply(proxyContext));
+        if (proxyContext.request().headers().contains(name)) {
+            proxyContext.request().headers().set(name, mapper.apply(proxyContext));
+        }
         return proxyContext.sendRequest();
     }
 }
