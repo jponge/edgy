@@ -9,17 +9,18 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
-public class RequestHeaderAdder implements RequestTransformer {
+/** Sets a request header unconditionally, overwriting any existing value. */
+public class RequestHeaderSetter implements RequestTransformer {
 
     private final String name;
     private final Function<ProxyContext, String> mapper;
 
-    public RequestHeaderAdder(String name, Function<ProxyContext, String> mapper) {
+    public RequestHeaderSetter(String name, Function<ProxyContext, String> mapper) {
         this.name = Objects.requireNonNull(name);
         this.mapper = Objects.requireNonNull(mapper);
     }
 
-    public RequestHeaderAdder(String name, String fixedValue) {
+    public RequestHeaderSetter(String name, String fixedValue) {
         this(name, proxyContext -> fixedValue);
     }
 

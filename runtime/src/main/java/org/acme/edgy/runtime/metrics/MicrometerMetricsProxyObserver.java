@@ -16,6 +16,7 @@ import org.acme.edgy.runtime.api.RoutingEntry;
 import org.acme.edgy.runtime.api.ScatterObservation;
 import org.acme.edgy.runtime.api.ScatterRoute;
 import org.acme.edgy.runtime.api.utils.StatusCode;
+import org.acme.edgy.runtime.cache.CacheStatus;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -40,6 +41,10 @@ public class MicrometerMetricsProxyObserver implements ProxyObserver {
     private static final String TAG_ORIGIN = "origin";
     private static final String TAG_STATUS = "status";
     private static final String TAG_OUTCOME = "outcome";
+    private static final String TAG_CACHE = "cache";
+
+    /** Tag value for a request whose origin has no cache, or whose method is not cacheable. */
+    private static final String CACHE_NONE = "NONE";
 
     private static final String OUTCOME_SUCCESS = "SUCCESS";
     private static final String OUTCOME_CLIENT_ERROR = "CLIENT_ERROR";
@@ -86,14 +91,16 @@ public class MicrometerMetricsProxyObserver implements ProxyObserver {
             public void end(ProxyContext context) {
                 int status = context.response().getStatusCode();
                 sample.stop(proxyTimer(route, method, status,
-                        StatusCode.isClientError(status) ? OUTCOME_CLIENT_ERROR : OUTCOME_SUCCESS));
+                        StatusCode.isClientError(status) ? OUTCOME_CLIENT_ERROR : OUTCOME_SUCCESS,
+                        cacheStatus(context)));
             }
 
             @Override
             public void error(ProxyContext context, Throwable error) {
                 int status = context.response().getStatusCode();
                 sample.stop(proxyTimer(route, method, status,
-                        error != null ? OUTCOME_PROXY_ERROR : OUTCOME_SERVER_ERROR));
+                        error != null ? OUTCOME_PROXY_ERROR : OUTCOME_SERVER_ERROR,
+                        cacheStatus(context)));
             }
         };
     }
@@ -121,13 +128,19 @@ public class MicrometerMetricsProxyObserver implements ProxyObserver {
         };
     }
 
-    private Timer proxyTimer(Route route, String method, int status, String outcome) {
+    private static String cacheStatus(ProxyContext context) {
+        CacheStatus status = context.get(CacheStatus.CONTEXT_KEY, CacheStatus.class);
+        return status == null ? CACHE_NONE : status.name();
+    }
+
+    private Timer proxyTimer(Route route, String method, int status, String outcome, String cache) {
         return Timer.builder(PROXY_REQUESTS)
                 .tag(TAG_METHOD, method)
                 .tag(TAG_ROUTE, route.path())
                 .tag(TAG_ORIGIN, route.origin().identifier())
                 .tag(TAG_STATUS, String.valueOf(status))
                 .tag(TAG_OUTCOME, outcome)
+                .tag(TAG_CACHE, cache)
                 .register(registry);
     }
 

@@ -1,7 +1,9 @@
 package org.acme.edgy.deployment;
 
+import java.util.Optional;
+
 import org.acme.edgy.runtime.CertificateUpdateEventListener;
-import org.acme.edgy.runtime.OriginHttpClientManager;
+import org.acme.edgy.runtime.OriginManager;
 import org.acme.edgy.runtime.RouterConfigurator;
 import org.acme.edgy.runtime.config.EdgyBuildTimeConfig;
 import org.acme.edgy.runtime.logging.LoggingProxyObserver;
@@ -16,6 +18,7 @@ import io.quarkus.deployment.Capability;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
+import io.quarkus.deployment.metrics.MetricsCapabilityBuildItem;
 
 class EdgyProcessor {
 
@@ -31,7 +34,7 @@ class EdgyProcessor {
     @BuildStep
     void setupAdditionalBeans(BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         additionalBeans.produce(new AdditionalBeanBuildItem(CertificateUpdateEventListener.class));
-        additionalBeans.produce(new AdditionalBeanBuildItem(OriginHttpClientManager.class));
+        additionalBeans.produce(new AdditionalBeanBuildItem(OriginManager.class));
         additionalBeans.produce(new AdditionalBeanBuildItem(RouterConfigurator.class));
     }
 
@@ -57,9 +60,10 @@ class EdgyProcessor {
     }
 
     @BuildStep
-    void setupMetricsObserver(EdgyBuildTimeConfig config, Capabilities capabilities,
+    void setupMetricsObserver(EdgyBuildTimeConfig config,
+            Optional<MetricsCapabilityBuildItem> metricsCapability,
             BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
-        boolean metricsPresent = capabilities.isPresent(Capability.METRICS);
+        boolean metricsPresent = metricsCapability.isPresent();
         boolean enabled = config.metrics().enabled().orElse(metricsPresent);
         if (!enabled || !metricsPresent) {
             return;

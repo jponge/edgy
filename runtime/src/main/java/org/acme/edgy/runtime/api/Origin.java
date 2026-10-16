@@ -3,10 +3,12 @@ package org.acme.edgy.runtime.api;
 import static org.acme.edgy.runtime.api.utils.StorkUtils.storkFuture;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.RequestOptions;
 import io.vertx.httpproxy.OriginRequestProvider;
+import io.vertx.httpproxy.ProxyInterceptor;
 
 public final class Origin {
 
@@ -29,6 +31,7 @@ public final class Origin {
     private final String path;
 
     private HttpClient httpClient;
+    private ProxyInterceptor cacheInterceptor;
 
     private Origin(String identifier, Protocol protocol, String host, int port, String path) {
         this.identifier = identifier;
@@ -72,6 +75,19 @@ public final class Origin {
             throw new IllegalStateException("Origin already has an HttpClient assigned");
         }
         this.httpClient = httpClient;
+    }
+
+    public Optional<ProxyInterceptor> cacheInterceptor() {
+        return Optional.ofNullable(cacheInterceptor);
+    }
+
+    public void setCacheInterceptor(ProxyInterceptor cacheInterceptor) {
+        Objects.requireNonNull(cacheInterceptor, "cacheInterceptor");
+        ProxyInterceptor existing = this.cacheInterceptor;
+        if (existing != null && existing != cacheInterceptor) {
+            throw new IllegalStateException("Origin already has a cache interceptor assigned");
+        }
+        this.cacheInterceptor = cacheInterceptor;
     }
 
     public String identifier() {

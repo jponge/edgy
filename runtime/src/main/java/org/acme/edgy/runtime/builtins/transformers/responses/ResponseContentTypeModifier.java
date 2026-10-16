@@ -19,6 +19,11 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
 
+/**
+ * Sets the response Content-Type header. When the charset changes, the
+ * body is re-encoded automatically. Returns 413 if the body exceeds
+ * the accumulator size limit during re-encoding.
+ */
 public class ResponseContentTypeModifier implements ResponseTransformer {
     private static final String FALLBACK_CHARSET = StandardCharsets.UTF_8.toString();
 

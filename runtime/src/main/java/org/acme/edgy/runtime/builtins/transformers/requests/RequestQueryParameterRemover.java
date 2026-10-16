@@ -16,6 +16,7 @@ import io.vertx.core.Future;
 import io.vertx.httpproxy.ProxyContext;
 import io.vertx.httpproxy.ProxyResponse;
 
+/** Removes query parameters by name from the request URI. */
 public class RequestQueryParameterRemover implements RequestTransformer {
 
     private final Function<ProxyContext, Collection<String>> mapper;

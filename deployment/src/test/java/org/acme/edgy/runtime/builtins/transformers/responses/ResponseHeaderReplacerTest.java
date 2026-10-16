@@ -22,7 +22,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkus.test.QuarkusExtensionTest;
 import io.restassured.RestAssured;
 
-class ResponseHeaderModifierTest {
+class ResponseHeaderReplacerTest {
 
     private static final String HEADER_NAME_TO_BE_CHANGED = "X-Test";
     private static final String HEADER_NAME_NOT_TO_BE_CHANGED = "X-NotThere";
@@ -37,11 +37,11 @@ class ResponseHeaderModifierTest {
             return RoutingConfiguration.builder()
                     .addRoute(new Route("/modify-header",
                                             Origin.of("origin-1", "http://localhost:8081/test/modify-header"))
-                                    .addResponseTransformer(new ResponseHeaderModifier(
+                                    .addResponseTransformer(new ResponseHeaderReplacer(
                                             HEADER_NAME_TO_BE_CHANGED, MODIFIED_HEADER_VALUE)))
                     .addRoute(new Route("/no-header",
                                             Origin.of("origin-2", "http://localhost:8081/test/no-header"))
-                                    .addResponseTransformer(new ResponseHeaderModifier(
+                                    .addResponseTransformer(new ResponseHeaderReplacer(
                                             HEADER_NAME_TO_BE_CHANGED, MODIFIED_HEADER_VALUE))).build();
         }
     }

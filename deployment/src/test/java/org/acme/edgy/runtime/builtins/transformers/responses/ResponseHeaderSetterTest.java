@@ -19,7 +19,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkus.test.QuarkusExtensionTest;
 import io.restassured.RestAssured;
 
-class ResponseHeaderAdderTest {
+class ResponseHeaderSetterTest {
 
     private static final String CUSTOM_HEADER_1 = "X-YOLO";
     private static final String CUSTOM_HEADER_2 = "X-ABC";
@@ -33,8 +33,8 @@ class ResponseHeaderAdderTest {
         RoutingConfiguration routingConfiguration() {
             return RoutingConfiguration.builder()
                     .addRoute(new Route("/hello", Origin.of("origin-1", "http://localhost:8081/test"))
-                            .addResponseTransformer(new ResponseHeaderAdder(CUSTOM_HEADER_1, CUSTOM_HEADER_VALUE_1))
-                            .addResponseTransformer(new ResponseHeaderAdder(CUSTOM_HEADER_2, CUSTOM_HEADER_VALUE_2))).build();
+                            .addResponseTransformer(new ResponseHeaderSetter(CUSTOM_HEADER_1, CUSTOM_HEADER_VALUE_1))
+                            .addResponseTransformer(new ResponseHeaderSetter(CUSTOM_HEADER_2, CUSTOM_HEADER_VALUE_2))).build();
         }
     }
 

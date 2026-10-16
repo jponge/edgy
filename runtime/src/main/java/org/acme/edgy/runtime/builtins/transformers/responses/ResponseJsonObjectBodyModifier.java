@@ -14,6 +14,11 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.httpproxy.Body;
 import io.vertx.httpproxy.ProxyContext;
 
+/**
+ * Transforms or replaces a JSON object response body. An empty body is
+ * treated as an empty object. Returns 502 on malformed JSON from the
+ * origin, 413 if the body exceeds the accumulator size limit.
+ */
 public class ResponseJsonObjectBodyModifier extends AbstractJsonObjectBodyModifier
         implements ResponseTransformer {
 

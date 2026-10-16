@@ -154,6 +154,7 @@ class ScatterLegRequest extends HttpServerRequestInternal {
         return delegate.decoderResult();
     }
 
+    @SuppressWarnings("removal")
     @Override
     public X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException {
         return delegate.peerCertificateChain();

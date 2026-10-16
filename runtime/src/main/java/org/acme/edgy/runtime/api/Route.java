@@ -6,6 +6,21 @@ import java.util.Objects;
 import org.acme.edgy.runtime.api.utils.SegmentUtils;
 
 
+/**
+ * A path-bound proxy target that forwards matching requests to a single
+ * origin. This is the primary building block for routing configuration.
+ * <p>
+ * Paths use Jakarta REST segment syntax by default ({@link PathMode#BASIC}):
+ * {@code /api/users/{id}}, {@code /api/{name:regex}}. A trailing {@code /*}
+ * wildcard captures the remaining path and auto-appends it to the origin URI.
+ * <p>
+ * When a wildcard is present but the origin path contains no URI template
+ * variables, the suffix is forwarded automatically — no manual template
+ * setup is needed.
+ *
+ * @see RoutingConfiguration
+ * @see ScatterRoute
+ */
 public final class Route extends ProxyTarget<Route> implements RoutingEntry {
 
     final PathInfo pathInfo;
