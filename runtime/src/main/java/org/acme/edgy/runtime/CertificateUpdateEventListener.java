@@ -6,8 +6,6 @@ import org.jboss.logging.Logger;
 
 import io.quarkus.tls.CertificateUpdatedEvent;
 import io.quarkus.tls.TlsConfiguration;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.http.HttpClient;
 
 public class CertificateUpdateEventListener {
@@ -26,21 +24,12 @@ public class CertificateUpdateEventListener {
         for (HttpClient httpClientToBeChanged : originHttpClientManager
                 .clientsUsingTlsConfig(updatedTlsConfigurationName)) {
             httpClientToBeChanged.updateSSLOptions(updatedTlsConfiguration.getSSLOptions())
-                    .andThen(new Handler<AsyncResult<Boolean>>() {
-                        @Override
-                        public void handle(AsyncResult<Boolean> result) {
-                            if (result.succeeded()) {
-                                logger.infof(
-                                        "Certificate reload succeeded for TLS configuration (bucket) name '%s'.",
-                                        updatedTlsConfigurationName);
-                                return;
-                            }
-                            logger.errorf(result.cause(),
-                                    "Certificate reload failed for TLS configuration (bucket) name '%s'.",
-                                    updatedTlsConfigurationName);
-                        }
-                    });
-
+                    .onSuccess(
+                            v -> logger.infof("Certificate reload succeeded for TLS configuration (bucket) name '%s'.",
+                                    updatedTlsConfigurationName))
+                    .onFailure(cause -> logger.errorf(cause,
+                            "Certificate reload failed for TLS configuration (bucket) name '%s'.",
+                            updatedTlsConfigurationName));
         }
     }
 }
