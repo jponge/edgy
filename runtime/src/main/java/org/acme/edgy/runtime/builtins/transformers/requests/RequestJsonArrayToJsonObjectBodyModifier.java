@@ -18,7 +18,8 @@ import io.vertx.httpproxy.ProxyResponse;
 
 /**
  * Request transformer that converts JSON Array bodies to JSON Object bodies. Useful for
- * transforming array responses into structured objects.
+ * transforming array requests into structured objects. Returns 400 on malformed JSON,
+ * 413 if the body exceeds the accumulator size limit.
  */
 public class RequestJsonArrayToJsonObjectBodyModifier
         extends AbstractJsonArrayToJsonObjectBodyModifier implements RequestTransformer {

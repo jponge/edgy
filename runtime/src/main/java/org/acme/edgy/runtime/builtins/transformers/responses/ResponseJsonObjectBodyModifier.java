@@ -43,7 +43,7 @@ public class ResponseJsonObjectBodyModifier extends AbstractJsonObjectBodyModifi
         return applyDynamicBody(proxyContext, ProxyContext::sendResponse).recover(throwable -> {
             if (throwable instanceof DecodeException) {
                 return ProxyErrorResponseBuilder.create(proxyContext)
-                        .badRequest()
+                        .badGateway()
                         .message(throwable.getMessage())
                         .sendResponseInResponseTransformer();
             }
