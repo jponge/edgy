@@ -94,7 +94,7 @@ public final class Origin {
         return identifier;
     }
 
-    public Protocol protocol() {
+    Protocol protocol() {
         return protocol;
     }
 
