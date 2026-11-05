@@ -2,6 +2,7 @@ package org.acme.edgy.runtime.api.utils;
 
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.acme.edgy.runtime.api.utils.StatusCode.BAD_GATEWAY;
 import static org.acme.edgy.runtime.api.utils.StatusCode.BAD_REQUEST;
 import static org.acme.edgy.runtime.api.utils.StatusCode.INTERNAL_SERVER_ERROR;
 import static org.acme.edgy.runtime.api.utils.StatusCode.PAYLOAD_TOO_LARGE;
@@ -54,6 +55,10 @@ public final class ProxyErrorResponseBuilder {
 
     public ProxyErrorResponseBuilder badRequest() {
         return statusCode(BAD_REQUEST);
+    }
+
+    public ProxyErrorResponseBuilder badGateway() {
+        return statusCode(BAD_GATEWAY);
     }
 
     public ProxyErrorResponseBuilder payloadTooLarge() {

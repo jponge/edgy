@@ -17,7 +17,8 @@ import io.vertx.httpproxy.ProxyContext;
 
 /**
  * Response transformer that converts JSON Array bodies to JSON Object bodies. Useful for
- * transforming array responses into structured objects.
+ * transforming array responses into structured objects. Returns 502 on malformed JSON
+ * from the origin, 413 if the body exceeds the accumulator size limit.
  */
 public class ResponseJsonArrayToJsonObjectBodyModifier
         extends AbstractJsonArrayToJsonObjectBodyModifier implements ResponseTransformer {
@@ -37,7 +38,7 @@ public class ResponseJsonArrayToJsonObjectBodyModifier
         return applyDynamicBody(proxyContext, ProxyContext::sendResponse).recover(throwable -> {
             if (throwable instanceof DecodeException) {
                 return ProxyErrorResponseBuilder.create(proxyContext)
-                        .badRequest()
+                        .badGateway()
                         .message(throwable.getMessage())
                         .sendResponseInResponseTransformer();
             }

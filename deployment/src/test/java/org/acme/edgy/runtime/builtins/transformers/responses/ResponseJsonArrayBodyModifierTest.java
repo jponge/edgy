@@ -3,7 +3,7 @@ package org.acme.edgy.runtime.builtins.transformers.responses;
 import static jakarta.ws.rs.core.HttpHeaders.CONTENT_LENGTH;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN;
-import static org.acme.edgy.runtime.api.utils.StatusCode.BAD_REQUEST;
+import static org.acme.edgy.runtime.api.utils.StatusCode.BAD_GATEWAY;
 import static org.acme.edgy.runtime.api.utils.StatusCode.OK;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
@@ -180,6 +180,6 @@ class ResponseJsonArrayBodyModifierTest {
     @Test
     void test_dynamicFailsDueToInvalidJSONBody() {
         RestAssured.given().contentType(APPLICATION_JSON).get("/invalid-json").then()
-                .statusCode(BAD_REQUEST).body(containsString("JSON"));
+                .statusCode(BAD_GATEWAY).body(containsString("JSON"));
     }
 }

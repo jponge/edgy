@@ -69,7 +69,8 @@ public class RouterConfigurator {
                 .origin(route.origin().originRequestProvider());
 
         addInterceptor(proxy::addInterceptor, new ObservingProxyInterceptor(observers, route), !observers.isEmpty());
-        addInterceptor(proxy::addInterceptor, new MethodBodyInterceptor(route), route.methodOverride() != null);
+        addInterceptor(proxy::addInterceptor, new MethodBodyInterceptor(route),
+                route.methodOverride() != null || route.keepBody());
         route.origin().cacheInterceptor().ifPresent(proxy::addInterceptor);
         addInterceptor(proxy::addInterceptor, new UriTemplateInterceptor(route));
         addInterceptor(proxy::addInterceptor, new QueryParamPropagationInterceptor());
